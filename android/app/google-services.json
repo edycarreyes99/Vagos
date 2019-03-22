@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1016940153037",
+    "firebase_url": "https://firecodes-vagos.firebaseio.com",
+    "project_id": "firecodes-vagos",
+    "storage_bucket": "firecodes-vagos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1016940153037:android:90391e2efc5fa085",
+        "android_client_info": {
+          "package_name": "com.firecodes.vagos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1016940153037-7hfhnvv8jlqk5v4gceh2c7sdrc054pg0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.firecodes.vagos",
+            "certificate_hash": "e3978ae7e5c243c07bfa4c483aba8f17c13340e1"
+          }
+        },
+        {
+          "client_id": "1016940153037-o2540dvdmofq54ouvihe1cs77br7tbs4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBE-XS2yPcHyd52CSalryK-3SD0laS3Km0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1016940153037-o2540dvdmofq54ouvihe1cs77br7tbs4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
