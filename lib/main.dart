@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.orange,
-        fontFamily: 'GoogleSans'
+        fontFamily: 'Arciform'
       ),
       home: new RouterPage(auth: new Servicio()),
       //RootPage(auth: new Auth()),

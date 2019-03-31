@@ -51,13 +51,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final registrarBtn = Padding(
-      padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+        padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
         child: FlatButton(
           child: Text('Registrarse',
               style: TextStyle(color: Colors.orange, fontSize: 18.0)),
-          onPressed: () {},
-        )
-    );
+          onPressed: () {
+            
+          },
+        ));
 
     final logo = Container(
         padding: EdgeInsets.all(0.0),
@@ -87,8 +88,9 @@ class _LoginPageState extends State<LoginPage> {
                         labelText: 'Email',
                         border: OutlineInputBorder(
                             borderRadius: const BorderRadius.all(
-                          const Radius.circular(10.0),
-                        )),
+                              const Radius.circular(30.0),
+                            ),
+                            borderSide: BorderSide.none),
                         filled: true,
                         fillColor: Colors.grey[200],
                         hasFloatingPlaceholder: true)),
@@ -106,7 +108,9 @@ class _LoginPageState extends State<LoginPage> {
                       labelText: 'Contraseña',
                       border: OutlineInputBorder(
                           borderRadius: const BorderRadius.all(
-                              const Radius.circular(10.0))),
+                              const Radius.circular(30.0)),
+                        borderSide: BorderSide.none
+                      ),
                       filled: true,
                       fillColor: Colors.grey[200]),
                 ),
@@ -128,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 50.0,
                 child: RaisedButton(
-                    onPressed: () => {print('Registrar se ha Precionado')},
+                    onPressed: () => {print('Iniciar Sesion con Google se ha precionado')},
                     color: Colors.white,
                     child: Row(
                       children: <Widget>[
@@ -138,7 +142,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('|',style: TextStyle(color: Colors.grey),),
+                          child: Text(
+                            '|',
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -155,42 +162,41 @@ class _LoginPageState extends State<LoginPage> {
         ));
 
     return Scaffold(
-        body: ListView(
+      backgroundColor: Colors.white,
+        body: Center(
+          child: ListView(
       shrinkWrap: true,
       padding: EdgeInsets.only(left: 24.0, right: 24.0),
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-          child: Wrap(
-            direction: Axis.horizontal,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: <Widget>[logo],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 50, 0, 10),
+            child: Center(
+              child: Text(
+                'Bienvenido',
+                style: TextStyle(
+                    //color: Colors.orange[700],
+                  color: Colors.black,
+                    fontSize: 50.0,
+                    fontFamily: 'Arciform'),
+              ),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-          child: Text(
-            'Bienvenido',
-            style: TextStyle(
-                color: Colors.orange[700],
-                fontSize: 50.0,
-                fontFamily: 'GoogleSans',
-                fontWeight: FontWeight.bold),
+          Center(
+            child: Text(
+              'Inicia sesión para continuar',
+              style: TextStyle(color: Colors.grey, fontSize: 15.0,fontFamily: 'Arciform'),
+            ),
           ),
-        ),
-        Text(
-          'Inicia sesión para continuar',
-          style: TextStyle(color: Colors.grey, fontSize: 15.0),
-        ),
-        Center(
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: 28.0),
-              loginForm,
-            ],
-          ),
-        )
+          Center(
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 28.0),
+                loginForm,
+              ],
+            ),
+          )
       ],
-    ));
+    ),
+        ));
   }
 }

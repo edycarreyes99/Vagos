@@ -53,6 +53,9 @@ flutter:
           style: italic
         - asset: 'assets/fuentes/GoogleSans/GoogleSans-Bold.ttf'
           weight: 700
+    - family: Arciform
+      fonts:
+        - asset: 'assets/fuentes/Arciform/Arciform.otf'
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
