@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onIniciado});
@@ -49,14 +50,22 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final logo = Hero(
-      tag: 'hero',
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        radius: 100.0,
-        child: Image.asset('assets/Logotipo.png'),
-      ),
+    final registrarBtn = Padding(
+      padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+        child: FlatButton(
+          child: Text('Registrarse',
+              style: TextStyle(color: Colors.orange, fontSize: 18.0)),
+          onPressed: () {},
+        )
     );
+
+    final logo = Container(
+        padding: EdgeInsets.all(0.0),
+        margin: EdgeInsets.all(0.0),
+        child: CircleAvatar(
+          radius: 25,
+          child: Image.asset('assets/Logotipo.png'),
+        ));
 
     final loginForm = Container(
         padding: EdgeInsets.all(16.0),
@@ -66,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
                     keyboardType: TextInputType.emailAddress,
                     autofocus: false,
@@ -75,61 +84,113 @@ class _LoginPageState extends State<LoginPage> {
                         : null,
                     onSaved: (value) => _email = value,
                     decoration: InputDecoration(
-                        hintText: 'Email',
-                        contentPadding:
-                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0))),
+                        labelText: 'Email',
+                        border: OutlineInputBorder(
+                            borderRadius: const BorderRadius.all(
+                          const Radius.circular(10.0),
+                        )),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        hasFloatingPlaceholder: true)),
               ),
               Container(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextFormField(
-                      autofocus: false,
-                      obscureText: true,
-                      validator: (value) => value.isEmpty
-                          ? 'La contraseña no puede estar en blanco.'
-                          : null,
-                      onSaved: (value) => _password = value,
-                      decoration: InputDecoration(
-                          hintText: 'Contraseña',
-                          contentPadding:
-                              EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0)))),
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: TextFormField(
+                  autofocus: false,
+                  obscureText: true,
+                  validator: (value) => value.isEmpty
+                      ? 'La contraseña no puede estar en blanco.'
+                      : null,
+                  onSaved: (value) => _password = value,
+                  decoration: InputDecoration(
+                      labelText: 'Contraseña',
+                      border: OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                              const Radius.circular(10.0))),
+                      filled: true,
+                      fillColor: Colors.grey[200]),
+                ),
+              ),
               Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: MaterialButton(
-                    minWidth: 200.0,
-                    height: 42.0,
-                    elevation: 5.0,
-                    onPressed: iniciarSesion,
-                    color: Colors.orange,
-                    child: Text(
-                      'Iniciar Sesion',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                  padding: EdgeInsets.fromLTRB(0, 48, 0, 16),
+                  child: SizedBox(
+                    height: 50.0,
+                    child: RaisedButton(
+                        onPressed: iniciarSesion,
+                        color: Colors.orange,
+                        child: Text(
+                          'Iniciar Sesion',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(50.0))),
                   )),
-              FlatButton(
-                child: Text('¿Has olvidado la contraseña?',
-                    style: TextStyle(color: Colors.black)),
-                onPressed: () {},
-              )
+              SizedBox(
+                height: 50.0,
+                child: RaisedButton(
+                    onPressed: () => {print('Registrar se ha Precionado')},
+                    color: Colors.white,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          FontAwesomeIcons.google,
+                          color: Colors.orange,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('|',style: TextStyle(color: Colors.grey),),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          child: Text('Inicia Sesion con Google'),
+                        )
+                      ],
+                    ),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(50.0))),
+              ),
+              registrarBtn
             ],
           ),
         ));
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: ListView(
-          shrinkWrap: true,
-          padding: EdgeInsets.only(left: 24.0, right: 24.0),
-          children: <Widget>[
-            logo,
-            SizedBox(height: 48.0),
-            loginForm,
-            SizedBox(
-              height: 48.0,
-            )
-          ],
+        body: ListView(
+      shrinkWrap: true,
+      padding: EdgeInsets.only(left: 24.0, right: 24.0),
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+          child: Wrap(
+            direction: Axis.horizontal,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: <Widget>[logo],
+          ),
         ),
-      ),
-    );
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+          child: Text(
+            'Bienvenido',
+            style: TextStyle(
+                color: Colors.orange[700],
+                fontSize: 50.0,
+                fontFamily: 'GoogleSans',
+                fontWeight: FontWeight.bold),
+          ),
+        ),
+        Text(
+          'Inicia sesión para continuar',
+          style: TextStyle(color: Colors.grey, fontSize: 15.0),
+        ),
+        Center(
+          child: Column(
+            children: <Widget>[
+              SizedBox(height: 28.0),
+              loginForm,
+            ],
+          ),
+        )
+      ],
+    ));
   }
 }
