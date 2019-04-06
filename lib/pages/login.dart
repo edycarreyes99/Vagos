@@ -230,42 +230,58 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    autofocus: false,
-                    validator: (value) => value.isEmpty
-                        ? 'El email no puede estar en blanco.'
-                        : null,
-                    onSaved: (value) => _email = value,
-                    decoration: InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(
-                            borderRadius: const BorderRadius.all(
-                              const Radius.circular(30.0),
-                            ),
-                            borderSide: BorderSide.none),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        hasFloatingPlaceholder: true)),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: TextFormField(
-                  autofocus: false,
-                  obscureText: true,
-                  validator: (value) => value.isEmpty
-                      ? 'La contraseña no puede estar en blanco.'
-                      : null,
-                  onSaved: (value) => _password = value,
-                  decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      border: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              const Radius.circular(30.0)),
-                          borderSide: BorderSide.none),
-                      filled: true,
-                      fillColor: Colors.grey[200]),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            autofocus: false,
+                            validator: (value) =>
+                            value.isEmpty
+                                ? 'El email no puede estar en blanco.'
+                                : null,
+                            onSaved: (value) => _email = value,
+                            decoration: InputDecoration(
+                                labelText: 'Email',
+                                contentPadding: EdgeInsets.fromLTRB(
+                                    15.0, 20.0, 20.0, 15.0),
+                                border: OutlineInputBorder(
+                                    borderRadius: const BorderRadius.all(
+                                      const Radius.circular(30.0),
+                                    ),
+                                    borderSide: BorderSide.none),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                hasFloatingPlaceholder: true)),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextFormField(
+                          autofocus: false,
+                          obscureText: true,
+                          validator: (value) =>
+                          value.isEmpty
+                              ? 'La contraseña no puede estar en blanco.'
+                              : null,
+                          onSaved: (value) => _password = value,
+                          decoration: InputDecoration(
+                              labelText: 'Contraseña',
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  15.0, 20.0, 20.0, 15.0),
+                              border: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                      const Radius.circular(30.0)),
+                                  borderSide: BorderSide.none),
+                              filled: true,
+                              fillColor: Colors.grey[200]),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Padding(
@@ -274,6 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 50.0,
                     child: RaisedButton(
                         onPressed: iniciarSesion,
+                        elevation: 6.0,
                         color: Colors.orange,
                         child: Text(
                           'Iniciar Sesión',
@@ -286,6 +303,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 50.0,
                 child: RaisedButton(
                     onPressed: () => iniciarSesionGoogle(),
+                    elevation: 7.0,
                     color: Colors.white,
                     child: Row(
                       children: <Widget>[
