@@ -7,6 +7,7 @@ abstract class BaseAuth {
   Future<String> currentUser();
   Future<void> cerrarSesion();
   Future<String> iniciarSesionGoogle();
+  Future<FirebaseUser> registrarse(String email, String password);
 }
 
 class Servicio implements BaseAuth {
@@ -27,9 +28,15 @@ class Servicio implements BaseAuth {
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
 
-    final FirebaseUser user = await _firebaseAuth.signInWithCredential(credential);
+    final FirebaseUser user =
+        await _firebaseAuth.signInWithCredential(credential);
     print('Se ha Iniciado sesion con Google como : ${user.displayName}');
     return user.email;
+  }
+
+  Future<FirebaseUser> registrarse(String email, String password) async {
+    FirebaseUser user = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+    return user;
   }
 
   Future<String> currentUser() async {

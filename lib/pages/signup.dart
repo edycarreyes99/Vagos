@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupPage extends StatefulWidget {
   SignupPage({this.auth, this.onIniciado});
@@ -45,6 +46,26 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    void registrarse() async {
+      if (validar()) {
+        try {
+          FirebaseUser user = await widget.auth.registrarse(_email, _password);
+          UserUpdateInfo userInfo = new UserUpdateInfo();
+          userInfo.displayName = _nombre + " " + _apellido;
+          userInfo.photoUrl = _profilePicture == null ? 'https://firebasestorage.googleapis.com/v0/b/grupo-ac.appspot.com/o/defaultMasculino.png?alt=media&token=32df9bdc-edf0-4ab4-a896-8d80959aa642' : null;
+          user.updateProfile(userInfo);
+          print("Se ha registrado como: ${user.email}");
+          Fluttertoast.showToast(
+            msg: 'Bienvenido ${user.email}',
+            backgroundColor: Colors.orange,
+            textColor: Colors.white
+          );
+        } catch (e) {
+          print(e);
+        }
+      }
+    }
+
     void iniciarSesionGoogle() async {
       try {
         String userEmail = await widget.auth.iniciarSesionGoogle();
@@ -58,23 +79,17 @@ class _SignupPageState extends State<SignupPage> {
         bool android = false;
         bool ios = false;
         bool fuchsiaa = false;
-        if (Theme
-            .of(context)
-            .platform == TargetPlatform.android) {
+        if (Theme.of(context).platform == TargetPlatform.android) {
           android = true;
           ios = false;
           fuchsiaa = false;
           print('Plataforma corriendo en Android');
-        } else if (Theme
-            .of(context)
-            .platform == TargetPlatform.iOS) {
+        } else if (Theme.of(context).platform == TargetPlatform.iOS) {
           ios = true;
           android = false;
           fuchsiaa = false;
           print('Plataforma corriendo en iOS');
-        } else if (Theme
-            .of(context)
-            .platform == TargetPlatform.fuchsia) {
+        } else if (Theme.of(context).platform == TargetPlatform.fuchsia) {
           fuchsiaa = true;
           android = false;
           ios = false;
@@ -93,7 +108,7 @@ class _SignupPageState extends State<SignupPage> {
               break;
             case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
               errorType =
-              'Error: Error de Conexion, por favor verifique su conexión a internet';
+                  'Error: Error de Conexion, por favor verifique su conexión a internet';
               toastError(errorType);
               break;
             default:
@@ -113,7 +128,7 @@ class _SignupPageState extends State<SignupPage> {
               break;
             case 'Error 17020':
               errorType =
-              'Error: Error de Conexion, por favor verifique su conexión a internet';
+                  'Error: Error de Conexion, por favor verifique su conexión a internet';
               toastError(errorType);
               break;
             default:
@@ -205,27 +220,27 @@ class _SignupPageState extends State<SignupPage> {
                       padding: const EdgeInsets.symmetric(vertical: 5),
                       child: Center(
                           child: Material(
-                            borderRadius: BorderRadius.circular(50),
-                            elevation: 8.0,
-                            child: GestureDetector(
-                              onTap: mostrarModal,
-                              child: CircleAvatar(
-                                backgroundColor: _profilePicture == null
-                                    ? Colors.grey[200]
-                                    : null,
-                                radius: 50,
-                                backgroundImage: _profilePicture == null
-                                    ? null
-                                    : FileImage(_profilePicture),
-                                child: _profilePicture == null
-                                    ? Icon(
-                                  Icons.add_a_photo,
-                                  size: 40,
-                                )
-                                    : null,
-                              ),
-                            ),
-                          )),
+                        borderRadius: BorderRadius.circular(50),
+                        elevation: 8.0,
+                        child: GestureDetector(
+                          onTap: mostrarModal,
+                          child: CircleAvatar(
+                            backgroundColor: _profilePicture == null
+                                ? Colors.grey[200]
+                                : null,
+                            radius: 50,
+                            backgroundImage: _profilePicture == null
+                                ? null
+                                : FileImage(_profilePicture),
+                            child: _profilePicture == null
+                                ? Icon(
+                                    Icons.add_a_photo,
+                                    size: 40,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      )),
                     ),
                     Center(
                       child: Padding(
@@ -248,8 +263,7 @@ class _SignupPageState extends State<SignupPage> {
                                 child: TextFormField(
                                   keyboardType: TextInputType.text,
                                   autofocus: false,
-                                  validator: (value) =>
-                                  value.isEmpty
+                                  validator: (value) => value.isEmpty
                                       ? 'El Nombre no puede estar Vacío'
                                       : null,
                                   onSaved: (value) => _nombre = value,
@@ -273,8 +287,7 @@ class _SignupPageState extends State<SignupPage> {
                                 child: TextFormField(
                                   keyboardType: TextInputType.text,
                                   autofocus: false,
-                                  validator: (value) =>
-                                  value.isEmpty
+                                  validator: (value) => value.isEmpty
                                       ? 'El Apellido no puede estar Vacío'
                                       : null,
                                   onSaved: (value) => _apellido = value,
@@ -299,15 +312,14 @@ class _SignupPageState extends State<SignupPage> {
                       child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
                           autofocus: false,
-                          validator: (value) =>
-                          value.isEmpty
+                          validator: (value) => value.isEmpty
                               ? 'El email no puede estar en blanco.'
                               : null,
                           onSaved: (value) => _email = value,
                           decoration: InputDecoration(
                               labelText: 'Email',
                               contentPadding:
-                              EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                  EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                               border: OutlineInputBorder(
                                   borderRadius: const BorderRadius.all(
                                       const Radius.circular(30.0)),
@@ -321,15 +333,14 @@ class _SignupPageState extends State<SignupPage> {
                       child: TextFormField(
                         autofocus: false,
                         obscureText: true,
-                        validator: (value) =>
-                        value.isEmpty
+                        validator: (value) => value.isEmpty
                             ? 'La Contraseña no puede estar vacía'
                             : null,
                         onSaved: (value) => _password = value,
                         decoration: InputDecoration(
                             labelText: 'Contraseña',
                             contentPadding:
-                            EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                             border: OutlineInputBorder(
                                 borderRadius: const BorderRadius.all(
                                     const Radius.circular(30.0)),
@@ -344,15 +355,14 @@ class _SignupPageState extends State<SignupPage> {
                       child: TextFormField(
                         autofocus: false,
                         obscureText: true,
-                        validator: (value) =>
-                        value.isEmpty
+                        validator: (value) => value.isEmpty
                             ? 'Este Campo no puede estar vacio'
                             : null,
                         onSaved: (value) => _password = value,
                         decoration: InputDecoration(
                             labelText: 'Repetir Contraseña',
                             contentPadding:
-                            EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                             border: OutlineInputBorder(
                                 borderRadius: const BorderRadius.all(
                                     const Radius.circular(30.0)),
@@ -367,15 +377,14 @@ class _SignupPageState extends State<SignupPage> {
                       child: TextFormField(
                           keyboardType: TextInputType.number,
                           autofocus: false,
-                          validator: (value) =>
-                          value.isEmpty
+                          validator: (value) => value.isEmpty
                               ? 'El número telefónico no pued estar vacio'
                               : null,
                           onSaved: (value) => _telefono = int.parse(value),
                           decoration: InputDecoration(
                               labelText: 'Teléfono',
                               contentPadding:
-                              EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                  EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                               border: OutlineInputBorder(
                                   borderRadius: const BorderRadius.all(
                                       const Radius.circular(30.0)),
@@ -393,7 +402,7 @@ class _SignupPageState extends State<SignupPage> {
                 child: SizedBox(
                   height: 50.0,
                   child: RaisedButton(
-                      onPressed: () => {},
+                      onPressed: () => registrarse(),
                       color: Colors.orange,
                       child: Text(
                         'Registrarse',
