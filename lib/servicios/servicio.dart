@@ -4,10 +4,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class BaseAuth {
   Future<String> iniciarSesion(String email, String password);
-  Future<String> currentUser();
+  Future<String> registrarNuevoUsuario(String email, String password);
+  Future<FirebaseUser> currentUser();
   Future<void> cerrarSesion();
   Future<String> iniciarSesionGoogle();
-  Future<FirebaseUser> registrarse(String email, String password);
 }
 
 class Servicio implements BaseAuth {
@@ -18,6 +18,12 @@ class Servicio implements BaseAuth {
     FirebaseUser user = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
     return user.email;
+  }
+
+  Future<String> registrarNuevoUsuario(String emaill, String passwordd) async {
+    FirebaseUser userr = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: emaill, password: passwordd);
+    return userr.email;
   }
 
   Future<String> iniciarSesionGoogle() async {
@@ -34,14 +40,9 @@ class Servicio implements BaseAuth {
     return user.email;
   }
 
-  Future<FirebaseUser> registrarse(String email, String password) async {
-    FirebaseUser user = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-    return user;
-  }
-
-  Future<String> currentUser() async {
+  Future<FirebaseUser> currentUser() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    return user.uid;
+    return user;
   }
 
   Future<void> cerrarSesion() async {
