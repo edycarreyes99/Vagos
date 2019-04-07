@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "1016940153037-go2robfjftg2t6fgvsmkin35c34itf1j.apps.googleusercontent.com",
+          "client_id": "1016940153037-frgfc7lf55k1duhimjg160g181iibjc4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.firecodes.vagos",
-            "certificate_hash": "289e94812f08536804d8281c95e251a475ede172"
+            "certificate_hash": "0a74364b141c12d71daf454c2170c404b6e1f5c9"
           }
         }
       ],
