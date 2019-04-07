@@ -6,12 +6,15 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:vagos/router.dart';
+import 'dart:async';
 
 class SignupPage extends StatefulWidget {
-  SignupPage({this.auth, this.onIniciado});
+  SignupPage({this.auth, this.onCerrarSesion});
   final BaseAuth auth;
 
-  final VoidCallback onIniciado;
+  final VoidCallback onCerrarSesion;
 
   static String tag = 'signup-page';
 
@@ -25,6 +28,8 @@ class _SignupPageState extends State<SignupPage> {
   final authh = FirebaseAuth.instance;
 
   final fs = Firestore.instance;
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   void toastError(String error) {
     Fluttertoast.showToast(
@@ -52,115 +57,138 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-
   Future<String> registrarNuevoUsuario(String emaill, String passwordd) async {
     FirebaseUser userr = await authh.createUserWithEmailAndPassword(
         email: emaill, password: passwordd);
     return userr.email;
   }
 
-  void actualizarDatosUsuarioFirestore(String email, String password, int telefono, String displayName, String photoUrl){
-    fs.document(usuariosRef+email).updateData({
-      'photoProfile':photoUrl,
+  Future<FirebaseUser> registrarseConGoogle() async {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-      'displayName':displayName,
-      'Email': email,
-      'Contrasena': password,
-      'Telefono': telefono
-    }).then((usuario)=>{
-      print("Los datos del usuario $email se han actualizado correctamente")
-    }).catchError((e)=>{
-      print(e)
-    });
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+        idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
+
+    final FirebaseUser user = await authh.signInWithCredential(credential);
+    print('Se ha Iniciado sesion con Google como : ${user.displayName}');
+    return user;
+  }
+
+  void actualizarDatosUsuarioFirestore(String email, String password,
+      int telefono, String displayName, String photoUrl) {
+    fs
+        .document(usuariosRef + email)
+        .updateData({
+          'photoProfile': photoUrl,
+          'displayName': displayName,
+          'Email': email,
+          'Contrasena': password,
+          'Telefono': telefono
+        })
+        .then((usuario) => {
+              print(
+                  "Los datos del usuario $email se han actualizado correctamente")
+            })
+        .catchError((e) => {print(e)});
   }
 
   void registrarse() async {
     //FirebaseUser user;
     if (validar()) {
-      try{
-        final String userEmail = await registrarNuevoUsuario(_email,_password);
-        print('Se ha registrado como: ${userEmail}');
-        Fluttertoast.showToast(
-            msg: 'Registro Completo. Inicia Sesion con tus nuevos datos.',
-            backgroundColor: Colors.orange,
-            textColor: Colors.white);
-        actualizarDatosUsuarioFirestore(_email,_password,_telefono, _nombre+" "+_apellido,_profilePicture.path);
-        Navigator.pop(context);
-      }catch (e) {
-        bool android = false;
-        bool ios = false;
-        bool fuchsiaa = false;
-        if (Theme.of(context).platform == TargetPlatform.android) {
-          android = true;
-          ios = false;
-          fuchsiaa = false;
-          print('Plataforma corriendo en Android');
-        } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-          ios = true;
-          android = false;
-          fuchsiaa = false;
-          print('Plataforma corriendo en iOS');
-        } else if (Theme.of(context).platform == TargetPlatform.fuchsia) {
-          fuchsiaa = true;
-          android = false;
-          ios = false;
-          print('Plataforma corriendo en Fuchsia');
-        }
-        String errorType = '';
-        if (android) {
-          switch (e.message) {
-            case 'The email address is already in use by another account.':
-              errorType = 'Error: El Usuario ya esta en uso!';
-              toastError(errorType);
-              break;
-            case 'The given password is invalid. [ Password should be at least 6 characters ]':
-              errorType = 'Error: La contraseña debe tener como minimo 6 caracteres';
-              toastError(errorType);
-              break;
-          /*case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
+      if (_profilePicture == null) {
+        toastError(
+            'Debe de Seleccionar una foto de perfil para poder continuar');
+      } else {
+        try {
+          final String userEmail =
+              await registrarNuevoUsuario(_email, _password);
+          print('Se ha registrado como: ${userEmail}');
+          Fluttertoast.showToast(
+              msg: 'Registro Completo. Inicia Sesion con tus nuevos datos.',
+              backgroundColor: Colors.orange,
+              textColor: Colors.white);
+          actualizarDatosUsuarioFirestore(_email, _password, _telefono,
+              _nombre + " " + _apellido, _profilePicture.path);
+          Navigator.pop(context);
+        } catch (e) {
+          bool android = false;
+          bool ios = false;
+          bool fuchsiaa = false;
+          if (Theme.of(context).platform == TargetPlatform.android) {
+            android = true;
+            ios = false;
+            fuchsiaa = false;
+            print('Plataforma corriendo en Android');
+          } else if (Theme.of(context).platform == TargetPlatform.iOS) {
+            ios = true;
+            android = false;
+            fuchsiaa = false;
+            print('Plataforma corriendo en iOS');
+          } else if (Theme.of(context).platform == TargetPlatform.fuchsia) {
+            fuchsiaa = true;
+            android = false;
+            ios = false;
+            print('Plataforma corriendo en Fuchsia');
+          }
+          String errorType = '';
+          if (android) {
+            switch (e.message) {
+              case 'The email address is already in use by another account.':
+                errorType = 'Error: El Usuario ya esta en uso!';
+                toastError(errorType);
+                break;
+              case 'The given password is invalid. [ Password should be at least 6 characters ]':
+                errorType =
+                    'Error: La contraseña debe tener como minimo 6 caracteres';
+                toastError(errorType);
+                break;
+              /*case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
               errorType =
               'Error: Error de Conexion, por favor verifique su conexión a internet';
               toastError(errorType);
               break;*/
-            default:
-              toastError(e.toString());
-              print('${e.message}');
-              toastError(e.message);
-          }
-        } else if (ios) {
-          switch (e.code) {
-            case 'Error 17011':
-              errorType = 'Error: El Usuario no Existe!';
-              toastError(errorType);
-              break;
-            case 'Error 17009':
-              errorType = 'Error: La contraseña no es correcta';
-              toastError(errorType);
-              break;
-          /*case 'Error 17020':
+              default:
+                toastError(e.toString());
+                print('${e.message}');
+                toastError(e.message);
+            }
+          } else if (ios) {
+            switch (e.code) {
+              case 'Error 17011':
+                errorType = 'Error: El Usuario no Existe!';
+                toastError(errorType);
+                break;
+              case 'Error 17009':
+                errorType = 'Error: La contraseña no es correcta';
+                toastError(errorType);
+                break;
+              /*case 'Error 17020':
               errorType =
               'Error: Error de Conexion, por favor verifique su conexión a internet';
               toastError(errorType);
               break;*/
-            default:
-              print('${e.toString()}');
-              toastError(e.toString());
+              default:
+                print('${e.toString()}');
+                toastError(e.toString());
+            }
           }
+          print('El Error Fue $errorType');
         }
-        print('El Error Fue $errorType');
       }
     }
   }
 
-  void iniciarSesionGoogle() async {
+  void registrarseGoogle() async {
     try {
-      String userEmail = await widget.auth.iniciarSesionGoogle();
-      print('Ha Iniciado Sesión con Google como: ${userEmail}');
+      FirebaseUser user = await registrarseConGoogle();
+      print('Ha Iniciado Sesión con Google como: ${user.email}');
       Fluttertoast.showToast(
-          msg: 'Bienvenido ${userEmail}',
+          msg: 'Registro Completo. Vuelva a Iniciar Sesion con Google',
           backgroundColor: Colors.orange,
           textColor: Colors.white);
-      widget.onIniciado();
+      Navigator.pop(context);
     } catch (e) {
       bool android = false;
       bool ios = false;
@@ -182,47 +210,8 @@ class _SignupPageState extends State<SignupPage> {
         print('Plataforma corriendo en Fuchsia');
       }
       String errorType = '';
-      if (android) {
-        switch (e.message) {
-          case 'There is no user record corresponding to this identifier. The user may have been deleted.':
-            errorType = 'Error: El Usuario no Existe!';
-            toastError(errorType);
-            break;
-          case 'The password is invalid or the user does not have a password.':
-            errorType = 'Error: La contraseña no es correcta';
-            toastError(errorType);
-            break;
-          case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
-            errorType =
-                'Error: Error de Conexion, por favor verifique su conexión a internet';
-            toastError(errorType);
-            break;
-          default:
-            toastError(e.toString());
-            print('${e.message}');
-            toastError(e.message);
-        }
-      } else if (ios) {
-        switch (e.code) {
-          case 'Error 17011':
-            errorType = 'Error: El Usuario no Existe!';
-            toastError(errorType);
-            break;
-          case 'Error 17009':
-            errorType = 'Error: La contraseña no es correcta';
-            toastError(errorType);
-            break;
-          case 'Error 17020':
-            errorType =
-                'Error: Error de Conexion, por favor verifique su conexión a internet';
-            toastError(errorType);
-            break;
-          default:
-            print('${e.message}');
-            toastError(e.message);
-        }
-      }
-      print('El Error Fue $errorType');
+
+      print('El Error Fue $e');
     }
   }
 
@@ -285,8 +274,6 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
         appBar: new AppBar(
           iconTheme: IconThemeData(color: Colors.white),
@@ -311,27 +298,27 @@ class _SignupPageState extends State<SignupPage> {
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Center(
                             child: Material(
-                              borderRadius: BorderRadius.circular(50),
-                              elevation: 8.0,
-                              child: GestureDetector(
-                                onTap: mostrarModal,
-                                child: CircleAvatar(
-                                  backgroundColor: _profilePicture == null
-                                      ? Colors.grey[200]
-                                      : null,
-                                  radius: 50,
-                                  backgroundImage: _profilePicture == null
-                                      ? null
-                                      : FileImage(_profilePicture),
-                                  child: _profilePicture == null
-                                      ? Icon(
-                                    Icons.add_a_photo,
-                                    size: 40,
-                                  )
-                                      : null,
-                                ),
-                              ),
-                            )),
+                          borderRadius: BorderRadius.circular(50),
+                          elevation: 8.0,
+                          child: GestureDetector(
+                            onTap: mostrarModal,
+                            child: CircleAvatar(
+                              backgroundColor: _profilePicture == null
+                                  ? Colors.grey[200]
+                                  : null,
+                              radius: 50,
+                              backgroundImage: _profilePicture == null
+                                  ? null
+                                  : FileImage(_profilePicture),
+                              child: _profilePicture == null
+                                  ? Icon(
+                                      Icons.add_a_photo,
+                                      size: 40,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        )),
                       ),
                       Center(
                         child: Padding(
@@ -340,7 +327,8 @@ class _SignupPageState extends State<SignupPage> {
                             _profilePicture == null
                                 ? 'Agregar Imagen de Perfil'
                                 : "Cambiar Imagen de Perfil",
-                            style: TextStyle(color: Colors.black, fontSize: 15.0),
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 15.0),
                           ),
                         ),
                       ),
@@ -350,7 +338,8 @@ class _SignupPageState extends State<SignupPage> {
                             children: <Widget>[
                               Flexible(
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 3, 0),
                                   child: TextFormField(
                                     keyboardType: TextInputType.text,
                                     autofocus: false,
@@ -363,7 +352,8 @@ class _SignupPageState extends State<SignupPage> {
                                         contentPadding: EdgeInsets.fromLTRB(
                                             15.0, 20.0, 20.0, 15.0),
                                         border: OutlineInputBorder(
-                                            borderRadius: const BorderRadius.all(
+                                            borderRadius: const BorderRadius
+                                                    .all(
                                                 const Radius.circular(30.0)),
                                             borderSide: BorderSide.none),
                                         filled: true,
@@ -374,7 +364,8 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                               Flexible(
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 3, 0),
                                   child: TextFormField(
                                     keyboardType: TextInputType.text,
                                     autofocus: false,
@@ -387,7 +378,8 @@ class _SignupPageState extends State<SignupPage> {
                                         contentPadding: EdgeInsets.fromLTRB(
                                             15.0, 20.0, 20.0, 15.0),
                                         border: OutlineInputBorder(
-                                            borderRadius: const BorderRadius.all(
+                                            borderRadius: const BorderRadius
+                                                    .all(
                                                 const Radius.circular(30.0)),
                                             borderSide: BorderSide.none),
                                         filled: true,
@@ -410,7 +402,7 @@ class _SignupPageState extends State<SignupPage> {
                             decoration: InputDecoration(
                                 labelText: 'Email',
                                 contentPadding:
-                                EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                    EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                                 border: OutlineInputBorder(
                                     borderRadius: const BorderRadius.all(
                                         const Radius.circular(30.0)),
@@ -431,7 +423,7 @@ class _SignupPageState extends State<SignupPage> {
                           decoration: InputDecoration(
                               labelText: 'Contraseña',
                               contentPadding:
-                              EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                  EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                               border: OutlineInputBorder(
                                   borderRadius: const BorderRadius.all(
                                       const Radius.circular(30.0)),
@@ -453,7 +445,7 @@ class _SignupPageState extends State<SignupPage> {
                           decoration: InputDecoration(
                               labelText: 'Repetir Contraseña',
                               contentPadding:
-                              EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                  EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                               border: OutlineInputBorder(
                                   borderRadius: const BorderRadius.all(
                                       const Radius.circular(30.0)),
@@ -475,7 +467,7 @@ class _SignupPageState extends State<SignupPage> {
                             decoration: InputDecoration(
                                 labelText: 'Teléfono',
                                 contentPadding:
-                                EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
+                                    EdgeInsets.fromLTRB(15.0, 20.0, 20.0, 15.0),
                                 border: OutlineInputBorder(
                                     borderRadius: const BorderRadius.all(
                                         const Radius.circular(30.0)),
@@ -489,7 +481,6 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
             ),
-
             Padding(
                 padding: EdgeInsets.fromLTRB(8, 10, 8, 16),
                 child: SizedBox(
@@ -509,7 +500,7 @@ class _SignupPageState extends State<SignupPage> {
               child: SizedBox(
                 height: 50.0,
                 child: RaisedButton(
-                    onPressed: iniciarSesionGoogle,
+                    onPressed: registrarseGoogle,
                     color: Colors.white,
                     child: Row(
                       children: <Widget>[
