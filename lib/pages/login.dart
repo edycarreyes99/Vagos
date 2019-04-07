@@ -90,8 +90,8 @@ class _LoginPageState extends State<LoginPage> {
               break;*/
             default:
               toastError(e.toString());
-              print('${e.message}');
-              toastError(e.message);
+              print('${e.toString()}');
+              toastError(e.toString());
           }
         } else if (ios) {
           switch (e.code) {
@@ -165,8 +165,8 @@ class _LoginPageState extends State<LoginPage> {
             break;
           default:
             toastError(e.toString());
-            print('${e.message}');
-            toastError(e.message);
+            print('${e.toString()}');
+            toastError(e.toString());
         }
       } else if (ios) {
         switch (e.code) {

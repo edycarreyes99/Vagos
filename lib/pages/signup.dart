@@ -62,6 +62,7 @@ class _SignupPageState extends State<SignupPage> {
   void actualizarDatosUsuarioFirestore(String email, String password, int telefono, String displayName, String photoUrl){
     fs.document(usuariosRef+email).updateData({
       'photoProfile':photoUrl,
+
       'displayName':displayName,
       'Email': email,
       'Contrasena': password,
@@ -148,25 +149,6 @@ class _SignupPageState extends State<SignupPage> {
         }
         print('El Error Fue $errorType');
       }
-      /*try{
-        user = await authh.createUserWithEmailAndPassword(email: _email, password: _password);
-      }catch (e){
-        print(e.toString());
-      }finally{
-        if(user!=null){
-          await authh.signInWithEmailAndPassword(email: _email, password: _password);
-          FirebaseUser currentUser = await authh.currentUser();
-          UserUpdateInfo userInfo = new UserUpdateInfo();
-          userInfo.displayName = _nombre + " " + _apellido;
-          userInfo.photoUrl = 'https://firebasestorage.googleapis.com/v0/b/grupo-ac.appspot.com/o/defaultMasculino.png?alt=media&token=32df9bdc-edf0-4ab4-a896-8d80959aa642';
-          currentUser.updateProfile(userInfo);
-          print("Se ha iniciado sesion como ${currentUser.displayName}");
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => RouterPage(auth: new Servicio())));
-        }else{
-          print("hubo un error intente de nuevo");
-        }
-      }*/
     }
   }
 
