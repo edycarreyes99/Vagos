@@ -21,10 +21,6 @@
             "package_name": "com.firecodes.vagos",
             "certificate_hash": "289e94812f08536804d8281c95e251a475ede172"
           }
-        },
-        {
-          "client_id": "1016940153037-o2540dvdmofq54ouvihe1cs77br7tbs4.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
@@ -33,20 +29,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "1016940153037-o2540dvdmofq54ouvihe1cs77br7tbs4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }
