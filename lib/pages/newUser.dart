@@ -9,12 +9,13 @@ class NewUserPage extends StatefulWidget {
   NewUserPage({this.auth});
   final BaseAuth auth;
 
+  static String tag = 'newUser-page';
+
   @override
   _NewUserPageState createState() => _NewUserPageState();
 }
 
 class _NewUserPageState extends State<NewUserPage> {
-
   final Firestore _fs = Firestore.instance;
 
   List<dynamic> idUsuarios = new List<dynamic>();
@@ -27,21 +28,6 @@ class _NewUserPageState extends State<NewUserPage> {
     // TODO: implement initState
     super.initState();
     print("Prueba de Init State");
-  }
-
-  void extraerCurrentUser() async {
-    try {
-      FirebaseUser currentUser = await widget.auth.currentUser();
-      this.currentUser = currentUser;
-      if (this.currentUser == null) {
-        print("No hay usuarios activos");
-        extraerCurrentUser();
-      } else {
-        print("El usuario activo actual es ${this.currentUser.email}");
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   final formKeyy = new GlobalKey<FormState>();
@@ -154,40 +140,31 @@ class _NewUserPageState extends State<NewUserPage> {
           Padding(
             padding: EdgeInsets.fromLTRB(8, 10, 8, 25),
             child: RaisedButton(
-                onPressed: () {
-                  if(this.currentUser==null){
-                    this.extraerCurrentUser();
-                  }else{
-                    _fs.document('/Vagos/Control').get().then((DocumentSnapshot control) {
-
-
-                      this.idUsuarios = control['UsuariosRegistrados'];
-                      this.extraerCurrentUser();
-                      print("Imprimiendo la lista actual de usuarios: ");
-                      print(this.idUsuarios.toString());
-                      this.idUsuarios.forEach((usuario){
-                        this.idUsuariosAux.add(usuario.toString());
-                      });
-
-                      this.idUsuariosAux.add(this.currentUser.email.toString());
-
-
-                      _fs.document('/Vagos/Control').updateData({
-                        'UsuariosRegistrados': this.idUsuariosAux
-                      }).then((control){
-                        print("El usuario ${this.currentUser.email} se ha agregado correctamente a la lista de ids de usuarios");
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => RouterPage(auth: new Servicio())),
-                                (Route<dynamic> route) =>
-                            false);
-                      }).catchError((e)=>{
-                      print(e.toString())
-                      });
-
-
-                    }).catchError((e) => {print(e)});
-                  }
+                onPressed: () async {
+                  await this
+                      .widget
+                      .auth
+                      .currentUser()
+                      .then((FirebaseUser user) async {
+                    await this
+                        .widget
+                        .auth
+                        .agregarNuevoUsuarioRegistradoAlControl(
+                            user.email.toString())
+                        .then((List<String> idUsuarios) {
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RouterPage(
+                                    auth: this.widget.auth,
+                                  )),
+                          (Route<dynamic> route) => false);
+                    }).catchError((e) {
+                      print(e.toString());
+                    });
+                  }).catchError((e) {
+                    print(e.toString());
+                  });
                 },
                 color: Colors.orange,
                 child: Text(

@@ -8,8 +8,9 @@ import 'pages/newUser.dart';
 import 'package:vagos/pages/signup.dart';
 
 class RouterPage extends StatefulWidget {
-  RouterPage({this.auth});
+  RouterPage({this.auth,this.onIniciado});
   final BaseAuth auth;
+  final VoidCallback onIniciado;
 
   @override
   _RouterPageState createState() => _RouterPageState();
@@ -18,114 +19,72 @@ class RouterPage extends StatefulWidget {
 enum AuthState { noIniciado, iniciado }
 
 class _RouterPageState extends State<RouterPage> {
-  AuthState _authState = AuthState.noIniciado;
+  AuthState authState = AuthState.noIniciado;
 
   final _fs = Firestore.instance;
 
   FirebaseUser currentUser;
 
-  List idUsuarios = [];
-
   bool usuarioNuevo = false;
+
+  String respuesta;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _fs.document('/Vagos/Control').get().then((DocumentSnapshot control) {
-      this.idUsuarios = control['UsuariosRegistrados'];
-      print('Imprimiendo usuarios.');
-      print(this.idUsuarios.toString());
-      /*Timer(Duration(seconds: 2), () {
-        verificarSiEsUsuarioNuevo(this.idUsuarios, this.currentUser.uid);
-      });*/
-    }).catchError((e) => {print(e)});
+    Future<List<dynamic>> idUsuarios =
+        this.widget.auth.extraerUsuariosControl();
+    print(idUsuarios.toString());
 
     widget.auth.currentUser().then((userId) {
       setState(() {
-        _authState = userId == null ? AuthState.noIniciado : AuthState.iniciado;
+        authState = userId == null ? AuthState.noIniciado : AuthState.iniciado;
       });
     });
   }
 
-  void extraerCurrentUser() async {
-    try {
-      FirebaseUser currentUser = await widget.auth.currentUser();
-      this.currentUser = currentUser;
-      if (this.currentUser == null) {
-        print("No hay usuarios activos");
-        extraerCurrentUser();
-      } else {
-        print("Bienvenido ${this.currentUser.displayName}");
-        print("Tu direccion de foto de perfil es: ${this.currentUser.photoUrl}");
-        int coincidencias = 0;
-        this.idUsuarios.forEach((usuario) {
-          if (this.currentUser.email == usuario.toString()) {
-            coincidencias++;
-          }
-        });
-        if (coincidencias > 0) {
-          this.usuarioNuevo = false;
-        } else {
-          this.usuarioNuevo = true;
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void verificarSiEsUsuarioNuevo(List usuarios, String uid) {
-    int coincidencias = 0;
-    usuarios.forEach((usuario) {
-      if (usuario == uid) {
-        coincidencias++;
-      }
-    });
-    if (coincidencias > 0) {
-      this.usuarioNuevo = false;
-      print("no es usuario nuevo");
-    } else {
-      this.usuarioNuevo = true;
-      print("es usuario nuevo");
-    }
-  }
-
-  void iniciado() {
-    setState(() {
-      _authState = AuthState.iniciado;
-      extraerCurrentUser();
+  void iniciado() async {
+    await this.widget.auth.verificarSiEsUsuarioNuevo().then((String respuesta){
+      setState(() {
+        this.respuesta = respuesta;
+        authState = AuthState.iniciado;
+      });
+    }).catchError((e){
+      print(e.toString());
     });
   }
 
   void noIniciado() {
     setState(() {
-      _authState = AuthState.noIniciado;
+      authState = AuthState.noIniciado;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    switch (_authState) {
+    switch (authState) {
       case AuthState.noIniciado:
-        new SignupPage(auth: widget.auth,onCerrarSesion: noIniciado,);
+        SignupPage(auth: widget.auth,onIniciado: iniciado);
         return new LoginPage(
           auth: widget.auth,
           onIniciado: iniciado,
         );
       case AuthState.iniciado:
-        switch (this.usuarioNuevo) {
-          case true:
-            return new NewUserPage(
-              auth: widget.auth,
-            );
-            break;
-          case false:
-            return new HomePage(
-              auth: widget.auth,
-              onCerrarSesion: noIniciado,
-            );
-            break;
+        print("Ejecutando la orden para usuarios nuevos");
+        if(this.respuesta == "si"){
+          this.usuarioNuevo = false;
+          SignupPage(auth: widget.auth,onIniciado: iniciado);
+          return new NewUserPage(
+            auth: widget.auth,
+          );
+        }else{
+          this.usuarioNuevo = true;
+          SignupPage(auth: widget.auth,onIniciado: iniciado);
+          return new HomePage(
+            auth: widget.auth,
+            onCerrarSesion: noIniciado,
+          );
         }
     }
     return LoginPage(
