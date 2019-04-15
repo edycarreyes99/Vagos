@@ -8,9 +8,8 @@ import 'pages/newUser.dart';
 import 'package:vagos/pages/signup.dart';
 
 class RouterPage extends StatefulWidget {
-  RouterPage({this.auth,this.onIniciado});
+  RouterPage({this.auth});
   final BaseAuth auth;
-  final VoidCallback onIniciado;
 
   @override
   _RouterPageState createState() => _RouterPageState();
@@ -33,11 +32,14 @@ class _RouterPageState extends State<RouterPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future<List<dynamic>> idUsuarios =
-        this.widget.auth.extraerUsuariosControl();
-    print(idUsuarios.toString());
 
-    widget.auth.currentUser().then((userId) {
+    widget.auth.currentUser().then((userId) async{
+      this.respuesta = null;
+      this.widget.auth.extraerUsuariosControl().then((List<dynamic> idUsuarios){
+        print(idUsuarios.toString());
+      }).catchError((e){
+        print(e);
+      });
       setState(() {
         authState = userId == null ? AuthState.noIniciado : AuthState.iniciado;
       });

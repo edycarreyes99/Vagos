@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vagos/router.dart';
 import 'dart:async';
+import 'newUser.dart';
 
 class SignupPage extends StatefulWidget {
   SignupPage({this.auth, this.onIniciado});
@@ -267,12 +268,11 @@ class _SignupPageState extends State<SignupPage> {
                 setState(() {
                   _registrado = true;
                 });
-                this.widget.onIniciado;
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            RouterPage(auth: this.widget.auth,onIniciado: this.widget.onIniciado,)),
+                            NewUserPage(auth: this.widget.auth,)),
                     (Route<dynamic> route) => false);
               }).catchError((e) {
                 setState(() {

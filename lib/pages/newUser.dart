@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vagos/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class NewUserPage extends StatefulWidget {
   NewUserPage({this.auth});
@@ -32,12 +33,29 @@ class _NewUserPageState extends State<NewUserPage> {
 
   final formKeyy = new GlobalKey<FormState>();
 
-  File _profilePicture;
-
-  String _nombre;
   String _password;
-  String _apellido;
+  String _password2;
   int _telefono;
+
+  String usuariosRef = "/Vagos/Control/Usuarios/";
+
+  bool validar() {
+    final form = formKeyy.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void toastError(String error) {
+    Fluttertoast.showToast(
+        msg: error,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        timeInSecForIos: 5);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +117,7 @@ class _NewUserPageState extends State<NewUserPage> {
                     validator: (value) => value.isEmpty
                         ? 'Este Campo no puede estar vacio'
                         : null,
-                    onSaved: (value) => _password = value,
+                    onSaved: (value) => _password2 = value,
                     decoration: InputDecoration(
                         labelText: 'Repetir Contraseña',
                         contentPadding:
@@ -141,30 +159,58 @@ class _NewUserPageState extends State<NewUserPage> {
             padding: EdgeInsets.fromLTRB(8, 10, 8, 25),
             child: RaisedButton(
                 onPressed: () async {
-                  await this
-                      .widget
-                      .auth
-                      .currentUser()
-                      .then((FirebaseUser user) async {
-                    await this
-                        .widget
-                        .auth
-                        .agregarNuevoUsuarioRegistradoAlControl(
-                            user.email.toString())
-                        .then((List<String> idUsuarios) {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RouterPage(
-                                    auth: this.widget.auth,
-                                  )),
-                          (Route<dynamic> route) => false);
-                    }).catchError((e) {
-                      print(e.toString());
-                    });
-                  }).catchError((e) {
-                    print(e.toString());
-                  });
+                  if (validar()) {
+                    if (_password != _password2) {
+                      toastError("Las contraseñas no coinciden");
+                      setState(() {
+                        _password = "";
+                        _password2 = "";
+                      });
+                    } else {
+                      try {
+                        await this
+                            .widget
+                            .auth
+                            .currentUser()
+                            .then((FirebaseUser user) async {
+                          await this
+                              .widget
+                              .auth
+                              .agregarNuevoUsuarioRegistradoAlControl(
+                                  user.email.toString())
+                              .then((List<String> idUsuarios) {
+                            _fs
+                                .document(usuariosRef + user.email.toString())
+                                .updateData({
+                              'photoProfile': user.photoUrl,
+                              'displayName': user.displayName,
+                              'Email': user.email,
+                              'Contrasena': _password,
+                              'Telefono': _telefono
+                            }).then((respuesta) {
+                              user.updatePassword(_password);
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RouterPage(
+                                            auth: this.widget.auth,
+                                          )),
+                                  (Route<dynamic> route) => false);
+                            }).catchError((e) {
+                              print(e.toString());
+                            });
+                          }).catchError((e) {
+                            print(e.toString());
+                          });
+                        }).catchError((e) {
+                          print(e.toString());
+                        });
+                      } catch (e) {
+                        print(e.toString());
+                        toastError(e.toString());
+                      }
+                    }
+                  }
                 },
                 color: Colors.orange,
                 child: Text(
