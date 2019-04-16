@@ -86,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: Colors.orange,
             textColor: Colors.white);
         widget.onIniciado();
+        Navigator.pop(context);
       } catch (e) {
         bool android = false;
         bool ios = false;
@@ -161,6 +162,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.orange,
           textColor: Colors.white);
       widget.onIniciado();
+      Navigator.pop(context);
     } catch (e) {
       bool android = false;
       bool ios = false;
