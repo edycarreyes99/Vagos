@@ -20,7 +20,7 @@ class NavSide extends StatefulWidget {
   final VoidCallback onCerrarSesion;
 
   final drawerItems = [
-    new DrawerItem("Inicio", Icons.rss_feed),
+    new DrawerItem("Actividades", Icons.explore),
     new DrawerItem("Prueba", Icons.local_pizza),
   ];
 
@@ -100,7 +100,7 @@ class _NavSideState extends State<NavSide> {
           child: Container(
             decoration: i == _selectedDrawerIndex
                 ? BoxDecoration(
-                    color: Colors.orange[50],
+                    color: Colors.orange[100],
                     borderRadius: BorderRadius.only(
                         topRight: Radius.circular(50),
                         bottomRight: Radius.circular(50)))
