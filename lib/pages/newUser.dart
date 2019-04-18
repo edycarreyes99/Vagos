@@ -173,29 +173,36 @@ class _NewUserPageState extends State<NewUserPage> {
                             .auth
                             .currentUser()
                             .then((FirebaseUser user) async {
-                          await this
-                              .widget
-                              .auth
-                              .agregarNuevoUsuarioRegistradoAlControl(
-                                  user.email.toString())
-                              .then((List<String> idUsuarios) {
-                            _fs
-                                .document(usuariosRef + user.email.toString())
-                                .updateData({
-                              'photoProfile': user.photoUrl,
-                              'displayName': user.displayName,
-                              'Email': user.email,
-                              'Contrasena': _password,
-                              'Telefono': _telefono
-                            }).then((respuesta) {
-                              user.updatePassword(_password);
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RouterPage(
-                                            auth: this.widget.auth,
-                                          )),
-                                  (Route<dynamic> route) => false);
+                          _fs
+                              .document(
+                                  'Vagos/Control/Usuarios/${user.email.toString()}')
+                              .setData({}).then((resp) async {
+                            await this
+                                .widget
+                                .auth
+                                .agregarNuevoUsuarioRegistradoAlControl(
+                                    user.email.toString())
+                                .then((List<String> idUsuarios) {
+                              _fs
+                                  .document(usuariosRef + user.email.toString())
+                                  .updateData({
+                                'photoProfile': user.photoUrl,
+                                'displayName': user.displayName,
+                                'Email': user.email,
+                                'Contrasena': _password,
+                                'Telefono': _telefono
+                              }).then((respuesta) {
+                                user.updatePassword(_password);
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RouterPage(
+                                              auth: this.widget.auth,
+                                            )),
+                                    (Route<dynamic> route) => false);
+                              }).catchError((e) {
+                                print(e.toString());
+                              });
                             }).catchError((e) {
                               print(e.toString());
                             });
