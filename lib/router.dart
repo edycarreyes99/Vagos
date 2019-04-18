@@ -95,6 +95,7 @@ class _RouterPageState extends State<RouterPage> {
           return new HomePage(
             auth: widget.auth,
             onCerrarSesion: noIniciado,
+            drawerPosition: 0,
           );
         }
     }

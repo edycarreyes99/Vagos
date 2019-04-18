@@ -365,9 +365,6 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.orange,
-        statusBarIconBrightness: Brightness.dark));
 
     return Scaffold(
         appBar: new AppBar(

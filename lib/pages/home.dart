@@ -4,10 +4,12 @@ import 'package:vagos/servicios/servicio.dart';
 import 'dart:math';
 import 'package:floating_search_bar/floating_search_bar.dart';
 import 'login.dart';
+import 'navside.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.onCerrarSesion});
+  HomePage({this.auth, this.onCerrarSesion, this.drawerPosition});
   final BaseAuth auth;
+  final int drawerPosition;
   final VoidCallback onCerrarSesion;
   static String tag = 'home-page';
 
@@ -26,10 +28,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("el valor del drawer en en el es: ${this.widget.drawerPosition}");
+  }
+
+  @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.dark));
     Random random;
     int min = 1;
     int max = 9;
@@ -76,9 +82,13 @@ class _HomePageState extends State<HomePage> {
             trailing: CircleAvatar(
               backgroundImage: NetworkImage(
                   'https://lh4.googleusercontent.com/-2mUp9AT6uyQ/AAAAAAAAAAI/AAAAAAAAOR4/RKxeuCEf37I/photo.jpg'),
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.orange,
             ),
-            drawer: new Drawer(
+            drawer: new NavSide(
+              drawerPosition: this.widget.drawerPosition,
+              onCerrarSesion: this.widget.onCerrarSesion,
+              auth: this.widget.auth,
+            ) /*new Drawer(
               child: new ListView(
                 children: <Widget>[
                   new UserAccountsDrawerHeader(
@@ -223,7 +233,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-            ),
+            )*/
+                ,
             onChanged: (String value) {},
             onTap: () {
               /*Navigator.push(

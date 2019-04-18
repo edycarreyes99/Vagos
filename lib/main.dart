@@ -23,11 +23,6 @@ class _MyAppState extends State<MyApp> {
   };
   @override
   Widget build(BuildContext context) {
-
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.dark));
-
     return MaterialApp(
       title: 'Vagos',
       debugShowCheckedModeBanner: false,
