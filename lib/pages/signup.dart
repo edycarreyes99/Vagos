@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vagos/router.dart';
 import 'dart:async';
 import 'newUser.dart';
+import 'package:flutter/services.dart';
 
 class SignupPage extends StatefulWidget {
   SignupPage({this.auth, this.onIniciado});
@@ -271,8 +272,9 @@ class _SignupPageState extends State<SignupPage> {
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            NewUserPage(auth: this.widget.auth,)),
+                        builder: (context) => NewUserPage(
+                              auth: this.widget.auth,
+                            )),
                     (Route<dynamic> route) => false);
               }).catchError((e) {
                 setState(() {
@@ -363,6 +365,10 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.orange,
+        statusBarIconBrightness: Brightness.dark));
+
     return Scaffold(
         appBar: new AppBar(
           iconTheme: IconThemeData(color: Colors.white),

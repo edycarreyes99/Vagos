@@ -58,8 +58,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-<<<<<<< HEAD
-=======
   void actualizarDatosUsuarioFirestore(String email, String password,
       int telefono, String displayName, String photoUrl) {
     fs
@@ -78,7 +76,6 @@ class _LoginPageState extends State<LoginPage> {
         .catchError((e) => {print(e)});
   }
 
->>>>>>> cbf5a54ec02349486336c2dd6016f4fecc7e48c1
   void iniciarSesion() async {
     if (validar()) {
       try {
@@ -233,6 +230,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark));
+
     final loginForm = Container(
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -396,18 +398,10 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(
                                     color: Colors.orange, fontSize: 18.0)),
                             onPressed: () {
-<<<<<<< HEAD
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignupPage()));
-=======
-
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => SignupPage(auth: this.widget.auth,onIniciado: this.widget.onIniciado)));
->>>>>>> cbf5a54ec02349486336c2dd6016f4fecc7e48c1
                             },
                           ))
                     ],

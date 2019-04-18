@@ -5,6 +5,7 @@ import 'pages/login.dart';
 import 'router.dart';
 import 'pages/welcome.dart';
 import 'pages/signup.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(new MyApp());
 
@@ -22,6 +23,11 @@ class _MyAppState extends State<MyApp> {
   };
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark));
+
     return MaterialApp(
       title: 'Vagos',
       debugShowCheckedModeBanner: false,
