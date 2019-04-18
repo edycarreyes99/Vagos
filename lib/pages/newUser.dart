@@ -4,17 +4,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vagos/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class NewUserPage extends StatefulWidget {
   NewUserPage({this.auth});
   final BaseAuth auth;
+
+  static String tag = 'newUser-page';
 
   @override
   _NewUserPageState createState() => _NewUserPageState();
 }
 
 class _NewUserPageState extends State<NewUserPage> {
-
   final Firestore _fs = Firestore.instance;
 
   List<dynamic> idUsuarios = new List<dynamic>();
@@ -29,29 +31,31 @@ class _NewUserPageState extends State<NewUserPage> {
     print("Prueba de Init State");
   }
 
-  void extraerCurrentUser() async {
-    try {
-      FirebaseUser currentUser = await widget.auth.currentUser();
-      this.currentUser = currentUser;
-      if (this.currentUser == null) {
-        print("No hay usuarios activos");
-        extraerCurrentUser();
-      } else {
-        print("El usuario activo actual es ${this.currentUser.email}");
-      }
-    } catch (e) {
-      print(e);
+  final formKeyy = new GlobalKey<FormState>();
+
+  String _password;
+  String _password2;
+  int _telefono;
+
+  String usuariosRef = "/Vagos/Control/Usuarios/";
+
+  bool validar() {
+    final form = formKeyy.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
     }
   }
 
-  final formKeyy = new GlobalKey<FormState>();
-
-  File _profilePicture;
-
-  String _nombre;
-  String _password;
-  String _apellido;
-  int _telefono;
+  void toastError(String error) {
+    Fluttertoast.showToast(
+        msg: error,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        timeInSecForIos: 5);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +117,7 @@ class _NewUserPageState extends State<NewUserPage> {
                     validator: (value) => value.isEmpty
                         ? 'Este Campo no puede estar vacio'
                         : null,
-                    onSaved: (value) => _password = value,
+                    onSaved: (value) => _password2 = value,
                     decoration: InputDecoration(
                         labelText: 'Repetir Contraseña',
                         contentPadding:
@@ -154,39 +158,58 @@ class _NewUserPageState extends State<NewUserPage> {
           Padding(
             padding: EdgeInsets.fromLTRB(8, 10, 8, 25),
             child: RaisedButton(
-                onPressed: () {
-                  if(this.currentUser==null){
-                    this.extraerCurrentUser();
-                  }else{
-                    _fs.document('/Vagos/Control').get().then((DocumentSnapshot control) {
-
-
-                      this.idUsuarios = control['UsuariosRegistrados'];
-                      this.extraerCurrentUser();
-                      print("Imprimiendo la lista actual de usuarios: ");
-                      print(this.idUsuarios.toString());
-                      this.idUsuarios.forEach((usuario){
-                        this.idUsuariosAux.add(usuario.toString());
+                onPressed: () async {
+                  if (validar()) {
+                    if (_password != _password2) {
+                      toastError("Las contraseñas no coinciden");
+                      setState(() {
+                        _password = "";
+                        _password2 = "";
                       });
-
-                      this.idUsuariosAux.add(this.currentUser.email.toString());
-
-
-                      _fs.document('/Vagos/Control').updateData({
-                        'UsuariosRegistrados': this.idUsuariosAux
-                      }).then((control){
-                        print("El usuario ${this.currentUser.email} se ha agregado correctamente a la lista de ids de usuarios");
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => RouterPage(auth: new Servicio())),
-                                (Route<dynamic> route) =>
-                            false);
-                      }).catchError((e)=>{
-                      print(e.toString())
-                      });
-
-
-                    }).catchError((e) => {print(e)});
+                    } else {
+                      try {
+                        await this
+                            .widget
+                            .auth
+                            .currentUser()
+                            .then((FirebaseUser user) async {
+                          await this
+                              .widget
+                              .auth
+                              .agregarNuevoUsuarioRegistradoAlControl(
+                                  user.email.toString())
+                              .then((List<String> idUsuarios) {
+                            _fs
+                                .document(usuariosRef + user.email.toString())
+                                .updateData({
+                              'photoProfile': user.photoUrl,
+                              'displayName': user.displayName,
+                              'Email': user.email,
+                              'Contrasena': _password,
+                              'Telefono': _telefono
+                            }).then((respuesta) {
+                              user.updatePassword(_password);
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RouterPage(
+                                            auth: this.widget.auth,
+                                          )),
+                                  (Route<dynamic> route) => false);
+                            }).catchError((e) {
+                              print(e.toString());
+                            });
+                          }).catchError((e) {
+                            print(e.toString());
+                          });
+                        }).catchError((e) {
+                          print(e.toString());
+                        });
+                      } catch (e) {
+                        print(e.toString());
+                        toastError(e.toString());
+                      }
+                    }
                   }
                 },
                 color: Colors.orange,

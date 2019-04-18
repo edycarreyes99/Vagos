@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform;
@@ -9,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/rendering.dart';
 
 class LoginPage extends StatefulWidget {
@@ -60,6 +58,27 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+<<<<<<< HEAD
+=======
+  void actualizarDatosUsuarioFirestore(String email, String password,
+      int telefono, String displayName, String photoUrl) {
+    fs
+        .document(usuariosRef + email)
+        .updateData({
+          'photoProfile': photoUrl,
+          'displayName': displayName,
+          'Email': email,
+          'Contrasena': password,
+          'Telefono': telefono
+        })
+        .then((usuario) => {
+              print(
+                  "Los datos del usuario $email se han actualizado correctamente")
+            })
+        .catchError((e) => {print(e)});
+  }
+
+>>>>>>> cbf5a54ec02349486336c2dd6016f4fecc7e48c1
   void iniciarSesion() async {
     if (validar()) {
       try {
@@ -70,6 +89,7 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: Colors.orange,
             textColor: Colors.white);
         widget.onIniciado();
+        Navigator.pop(context);
       } catch (e) {
         bool android = false;
         bool ios = false;
@@ -145,6 +165,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.orange,
           textColor: Colors.white);
       widget.onIniciado();
+      Navigator.pop(context);
     } catch (e) {
       bool android = false;
       bool ios = false;
@@ -375,10 +396,18 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(
                                     color: Colors.orange, fontSize: 18.0)),
                             onPressed: () {
+<<<<<<< HEAD
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => SignupPage()));
+=======
+
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SignupPage(auth: this.widget.auth,onIniciado: this.widget.onIniciado)));
+>>>>>>> cbf5a54ec02349486336c2dd6016f4fecc7e48c1
                             },
                           ))
                     ],
