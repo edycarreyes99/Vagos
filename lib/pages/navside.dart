@@ -3,6 +3,8 @@ import 'pruebadrawer.dart';
 import 'home.dart';
 import 'dart:math';
 import 'package:vagos/servicios/servicio.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DrawerItem {
   String title;
@@ -30,6 +32,26 @@ class NavSide extends StatefulWidget {
 
 class _NavSideState extends State<NavSide> {
   int _selectedDrawerIndex = 0;
+
+  final Firestore _fs = Firestore.instance;
+
+  String profilePhoto;
+  String displayName;
+  String correo;
+
+  extraerDatosUsuario() async {
+    await this.widget.auth.currentUser().then((FirebaseUser user)async{
+      await _fs.document('Vagos/Control/Usuarios/${user.email.toString()}').get().then((DocumentSnapshot usuario){
+        this.profilePhoto = usuario['photoProfile'].toString();
+        this.displayName = usuario['displayName'].toString();
+        this.correo = usuario['Email'].toString();
+      }).catchError((e){
+        print(e.toString());
+      });
+    }).catchError((e){
+      print(e.toString());
+    });
+  }
 
   _getDrawerItemWidget(int pos) {
     switch (pos) {
@@ -73,6 +95,7 @@ class _NavSideState extends State<NavSide> {
     super.initState();
     _selectedDrawerIndex = this.widget.drawerPosition;
     print("Se ha navegado a la posicion: $_selectedDrawerIndex");
+    this.extraerDatosUsuario();
   }
 
   @override
@@ -138,11 +161,11 @@ class _NavSideState extends State<NavSide> {
         children: <Widget>[
           new UserAccountsDrawerHeader(
             accountName: new Text(
-              'Edycar Reyes',
+              this.displayName,
               style: TextStyle(color: Colors.white),
             ),
             accountEmail: new Text(
-              'edycarreyes@gmail.com',
+              this.correo,
               style: TextStyle(color: Colors.white),
             ),
             currentAccountPicture: new GestureDetector(
@@ -154,7 +177,7 @@ class _NavSideState extends State<NavSide> {
                         onCerrarSesion: this.widget.onCerrarSesion))),*/
               child: new CircleAvatar(
                 backgroundImage: new NetworkImage(
-                    'https://lh4.googleusercontent.com/-2mUp9AT6uyQ/AAAAAAAAAAI/AAAAAAAAOR4/RKxeuCEf37I/photo.jpg'),
+                    this.profilePhoto),
               ),
             ),
             decoration: new BoxDecoration(

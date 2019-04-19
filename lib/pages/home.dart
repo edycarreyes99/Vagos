@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:vagos/servicios/servicio.dart';
-import 'dart:math';
 import 'package:floating_search_bar/floating_search_bar.dart';
-import 'login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'navside.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onCerrarSesion, this.drawerPosition});
@@ -27,21 +26,41 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Firestore _fs = Firestore.instance;
+
+  String profilePhoto;
+  String displayName;
+  String correo;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     print("el valor del drawer en en el es: ${this.widget.drawerPosition}");
+    this._extraerDatosUsuario();
+  }
+
+  _extraerDatosUsuario() async {
+    await this.widget.auth.currentUser().then((FirebaseUser user) async {
+      await _fs
+          .document('Vagos/Control/Usuarios/${user.email.toString()}')
+          .get()
+          .then((DocumentSnapshot usuario) async {
+        setState(() {
+          this.profilePhoto = usuario['photoProfile'].toString();
+          this.displayName = usuario['displayName'].toString();
+          this.correo = usuario['Email'].toString();
+        });
+      }).catchError((e) {
+        print(e.toString());
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    Random random;
-    int min = 1;
-    int max = 9;
-    random = new Random();
-    int r = min + random.nextInt(max - min);
-
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Arial'),
       debugShowCheckedModeBanner: false,
@@ -80,8 +99,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             trailing: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://lh4.googleusercontent.com/-2mUp9AT6uyQ/AAAAAAAAAAI/AAAAAAAAOR4/RKxeuCEf37I/photo.jpg'),
+              backgroundImage: NetworkImage(this.profilePhoto),
               backgroundColor: Colors.orange,
             ),
             drawer: new NavSide(
