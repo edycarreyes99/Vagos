@@ -40,15 +40,20 @@ class _NavSideState extends State<NavSide> {
   String correo;
 
   extraerDatosUsuario() async {
-    await this.widget.auth.currentUser().then((FirebaseUser user)async{
-      await _fs.document('Vagos/Control/Usuarios/${user.email.toString()}').get().then((DocumentSnapshot usuario){
-        this.profilePhoto = usuario['photoProfile'].toString();
-        this.displayName = usuario['displayName'].toString();
-        this.correo = usuario['Email'].toString();
-      }).catchError((e){
+    await this.widget.auth.currentUser().then((FirebaseUser user) async {
+      await _fs
+          .document('Vagos/Control/Usuarios/${user.email.toString()}')
+          .get()
+          .then((DocumentSnapshot usuario) {
+        setState(() {
+          this.profilePhoto = usuario['photoProfile'].toString();
+          this.displayName = usuario['displayName'].toString();
+          this.correo = usuario['Email'].toString();
+        });
+      }).catchError((e) {
         print(e.toString());
       });
-    }).catchError((e){
+    }).catchError((e) {
       print(e.toString());
     });
   }
@@ -161,11 +166,11 @@ class _NavSideState extends State<NavSide> {
         children: <Widget>[
           new UserAccountsDrawerHeader(
             accountName: new Text(
-              this.displayName,
+              this.displayName == null ? 'Usuario' : this.displayName,
               style: TextStyle(color: Colors.white),
             ),
             accountEmail: new Text(
-              this.correo,
+              this.correo == null ? 'example@username.com' : this.correo,
               style: TextStyle(color: Colors.white),
             ),
             currentAccountPicture: new GestureDetector(
@@ -176,8 +181,9 @@ class _NavSideState extends State<NavSide> {
                         auth: this.widget.auth,
                         onCerrarSesion: this.widget.onCerrarSesion))),*/
               child: new CircleAvatar(
-                backgroundImage: new NetworkImage(
-                    this.profilePhoto),
+                backgroundImage: this.profilePhoto == null
+                    ? AssetImage('assets/profilePhotos/defaultMasculino.png')
+                    : NetworkImage(this.profilePhoto),
               ),
             ),
             decoration: new BoxDecoration(

@@ -99,7 +99,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             trailing: CircleAvatar(
-              backgroundImage: NetworkImage(this.profilePhoto),
+              backgroundImage: this.profilePhoto == null
+                  ? AssetImage('assets/profilePhotos/defaultMasculino.png')
+                  : NetworkImage(this.profilePhoto),
               backgroundColor: Colors.orange,
             ),
             drawer: new NavSide(
