@@ -5,7 +5,6 @@ import 'pages/login.dart';
 import 'router.dart';
 import 'pages/welcome.dart';
 import 'pages/signup.dart';
-import 'package:flutter/services.dart';
 
 void main() => runApp(new MyApp());
 

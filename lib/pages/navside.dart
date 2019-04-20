@@ -113,7 +113,7 @@ class _NavSideState extends State<NavSide> {
     var drawerOptions = <Widget>[];
     for (var i = 0; i < widget.drawerItems.length; i++) {
       var d = widget.drawerItems[i];
-      /**drawerOptions.add(new ListTile(
+      /*drawerOptions.add(new ListTile(
         leading: new Icon(d.icon),
         title: new Text(d.title),
         selected: i == _selectedDrawerIndex,

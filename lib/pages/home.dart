@@ -28,9 +28,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Firestore _fs = Firestore.instance;
 
+  final CollectionReference actividadesRef =
+      Firestore.instance.collection('Vagos/Control/Actividades');
+
   String profilePhoto;
   String displayName;
   String correo;
+  int cantActividades = 0;
 
   @override
   void initState() {
@@ -65,39 +69,74 @@ class _HomePageState extends State<HomePage> {
       theme: ThemeData(fontFamily: 'Arial'),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: CircleAvatar(
-            child: Image.asset('assets/AddGoogleLogo.png'),
-            radius: 11.5,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {},
+            child: CircleAvatar(
+              child: Image.asset('assets/AddGoogleLogo.png'),
+              radius: 11.5,
+              backgroundColor: Colors.white,
+            ),
             backgroundColor: Colors.white,
           ),
-          backgroundColor: Colors.white,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: FloatingSearchBar(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 20.0, 0, 30.0),
-                child: new Container(
-                  child: Center(
-                    child: Text('Hola Mundo'),
-                  ),
-                ),
-              ),
-              new Container(
-                margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                child: Center(
-                  child: MaterialButton(
-                    onPressed: () => {widget.cerrarSesion()},
-                    color: Colors.orange,
-                    elevation: 5.0,
-                    child: new Text('Cerrar Sesion'),
-                  ),
-                ),
-              ),
-            ],
+          body: FloatingSearchBar.builder(
+            itemCount: 2,
+            itemBuilder: (BuildContext context, int index) {
+              return StreamBuilder(
+                  stream: this.actividadesRef.snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        break;
+                      default:
+                        return ListTile(
+                          title: new Text(
+                              snapshot.data.documents[index].data['Nombre']),
+                          subtitle: new Text(
+                              snapshot.data.documents[index].data['Fecha']),
+                        );
+                    }
+                  });
+            },
+            /*children: <Widget>[
+              StreamBuilder(
+                  stream: this.actividadesRef.snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        break;
+                      default:
+                        return new Stack(
+                          children: snapshot.data.documents
+                              .map((DocumentSnapshot document) {
+                            return Container(
+                              child: new ListTile(
+                                title: new Text(document['Nombre']),
+                                subtitle: new Text(document['Fecha']),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                    }
+                  })
+            ],*/
             trailing: CircleAvatar(
               backgroundImage: this.profilePhoto == null
                   ? AssetImage('assets/profilePhotos/defaultMasculino.png')
@@ -118,9 +157,7 @@ class _HomePageState extends State<HomePage> {
             },
             decoration: InputDecoration.collapsed(
                 hintText: 'Buscar', hintStyle: TextStyle(color: Colors.black)),
-          ),
-        ),
-      ),
+          )),
     );
   }
 }
