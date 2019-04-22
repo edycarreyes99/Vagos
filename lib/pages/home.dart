@@ -34,17 +34,38 @@ class _HomePageState extends State<HomePage> {
   String profilePhoto;
   String displayName;
   String correo;
-  int cantActividades = 0;
+  int cantActividades = null;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     print("el valor del drawer en en el es: ${this.widget.drawerPosition}");
-    this._extraerDatosUsuario();
+    //this._extraerDatosUsuario();
+    this._extraerCantActividades();
+    print("hola mundo");
   }
 
-  _extraerDatosUsuario() async {
+  _extraerCantActividades() async {
+    print(
+        "ejecutando la orden para extraer la cantidad de actividades actual: ${this.cantActividades}");
+    await _fs
+        .collection('Vagos/Control/Actividades')
+        .snapshots()
+        .length
+        .then((valor) {
+      setState(() {
+        this.cantActividades = valor - 1;
+        print("la cantidad total de documentos es: " +
+            this.cantActividades.toString());
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
+  }
+
+  /*_extraerDatosUsuario() async {
+    print("extrayendo usuarios");
     await this.widget.auth.currentUser().then((FirebaseUser user) async {
       await _fs
           .document('Vagos/Control/Usuarios/${user.email.toString()}')
@@ -54,6 +75,8 @@ class _HomePageState extends State<HomePage> {
           this.profilePhoto = usuario['photoProfile'].toString();
           this.displayName = usuario['displayName'].toString();
           this.correo = usuario['Email'].toString();
+          print(
+              "se han extraido y se han guardado los valores en las variables en el set state para los datos");
         });
       }).catchError((e) {
         print(e.toString());
@@ -61,6 +84,18 @@ class _HomePageState extends State<HomePage> {
     }).catchError((e) {
       print(e.toString());
     });
+  }*/
+
+  /*realizarSetState(int cantActividades) {
+    setState(() {
+      this.cantActividades = cantActividades;
+      print(
+          "se actualizaron las cantidades: " + this.cantActividades.toString());
+    });
+  }*/
+
+  int extraercant() {
+    return this.cantActividades;
   }
 
   @override
@@ -79,7 +114,7 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.white,
           ),
           body: FloatingSearchBar.builder(
-            itemCount: 2,
+            itemCount: 3,
             itemBuilder: (BuildContext context, int index) {
               return StreamBuilder(
                   stream: this.actividadesRef.snapshots(),
@@ -97,6 +132,7 @@ class _HomePageState extends State<HomePage> {
                         );
                         break;
                       default:
+                        //this.realizarSetState(snapshot.data.documents.length);
                         return ListTile(
                           title: new Text(
                               snapshot.data.documents[index].data['Nombre']),
@@ -107,36 +143,36 @@ class _HomePageState extends State<HomePage> {
                   });
             },
             /*children: <Widget>[
-              StreamBuilder(
-                  stream: this.actividadesRef.snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                        break;
-                      default:
-                        return new Stack(
-                          children: snapshot.data.documents
-                              .map((DocumentSnapshot document) {
-                            return Container(
-                              child: new ListTile(
-                                title: new Text(document['Nombre']),
-                                subtitle: new Text(document['Fecha']),
-                              ),
-                            );
-                          }).toList(),
-                        );
-                    }
-                  })
-            ],*/
+                StreamBuilder(
+                    stream: this.actividadesRef.snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                          break;
+                        default:
+                          return new Stack(
+                            children: snapshot.data.documents
+                                .map((DocumentSnapshot document) {
+                              return Container(
+                                child: new ListTile(
+                                  title: new Text(document['Nombre']),
+                                  subtitle: new Text(document['Fecha']),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                      }
+                    })
+              ],*/
             trailing: CircleAvatar(
               backgroundImage: this.profilePhoto == null
                   ? AssetImage('assets/profilePhotos/defaultMasculino.png')
@@ -151,9 +187,9 @@ class _HomePageState extends State<HomePage> {
             onChanged: (String value) {},
             onTap: () {
               /*Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LoginPage(auth: this.widget.auth,onIniciado: this.widget.onCerrarSesion)));*/
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LoginPage(auth: this.widget.auth,onIniciado: this.widget.onCerrarSesion)));*/
             },
             decoration: InputDecoration.collapsed(
                 hintText: 'Buscar', hintStyle: TextStyle(color: Colors.black)),
