@@ -5,6 +5,7 @@ import 'pages/login.dart';
 import 'router.dart';
 import 'pages/welcome.dart';
 import 'pages/signup.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(new MyApp());
 
@@ -21,14 +22,18 @@ class _MyAppState extends State<MyApp> {
     SignupPage.tag: (context) => SignupPage()
   };
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //SystemChrome.setEnabledSystemUIOverlays([]);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vagos',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.orange,
-        fontFamily: 'Arciform'
-      ),
+      theme: ThemeData(primarySwatch: Colors.orange, fontFamily: 'Arciform'),
       home: new RouterPage(auth: new Servicio()),
       //home: new WelcomePage(),
       //RootPage(auth: new Auth()),

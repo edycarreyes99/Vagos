@@ -191,7 +191,7 @@ class _NavSideState extends State<NavSide> {
                 image: new DecorationImage(
                     fit: BoxFit.fill,
                     image: AssetImage(
-                        'assets/backgroundProfiles/background ($r).jpg'))),
+                        'assets/backgroundProfiles/background (4).jpg'))),
           ),
           new Column(
             children: drawerOptions,

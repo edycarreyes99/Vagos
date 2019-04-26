@@ -20,6 +20,7 @@ class _WelcomePageState extends State<WelcomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
+          child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -53,7 +54,9 @@ class _WelcomePageState extends State<WelcomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LoginPage(auth: this.widget.auth,onIniciado: this.widget.onIniciado)));
+                          builder: (context) => LoginPage(
+                              auth: this.widget.auth,
+                              onIniciado: this.widget.onIniciado)));
                 },
                 elevation: 8.0,
                 child: Padding(
@@ -76,7 +79,7 @@ class _WelcomePageState extends State<WelcomePage> {
             )
           ],
         ),
-      ),
+      )),
     );
   }
 }

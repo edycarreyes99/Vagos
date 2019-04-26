@@ -24,8 +24,11 @@ class _RouterPageState extends State<RouterPage> {
   FirebaseUser currentUser;
 
   bool usuarioNuevo = false;
+  int cantidadParticipacionesUsuario;
+  String correoUsuario;
 
   String respuesta;
+  List<DocumentSnapshot> actividades = new List<DocumentSnapshot>();
 
   @override
   void initState() {
@@ -38,7 +41,22 @@ class _RouterPageState extends State<RouterPage> {
           .widget
           .auth
           .extraerUsuariosControl()
-          .then((List<dynamic> idUsuarios) {
+          .then((List<dynamic> idUsuarios) async {
+        if (!(userId == null)) {
+          await this
+              ._fs
+              .document('Vagos/Control/Usuarios/${userId.email}')
+              .get()
+              .then((DocumentSnapshot usuario) {
+            setState(() {
+              this.cantidadParticipacionesUsuario =
+                  usuario.data['CantidadParticipaciones'];
+              this.correoUsuario = userId.email.toString();
+            });
+          }).catchError((e) {
+            print(e.toString());
+          });
+        }
         print(idUsuarios.toString());
       }).catchError((e) {
         print(e);
@@ -70,16 +88,16 @@ class _RouterPageState extends State<RouterPage> {
   Widget build(BuildContext context) {
     switch (authState) {
       case AuthState.noIniciado:
-            /*SignupPage(auth: widget.auth, onIniciado: iniciado);
+        /*SignupPage(auth: widget.auth, onIniciado: iniciado);
             return new LoginPage(
               auth: widget.auth,
               onIniciado: iniciado,
             );*/
-            SignupPage(auth: widget.auth, onIniciado: iniciado);
-            return new WelcomePage(
-              auth: widget.auth,
-              onIniciado: iniciado,
-            );
+        SignupPage(auth: widget.auth, onIniciado: iniciado);
+        return new WelcomePage(
+          auth: widget.auth,
+          onIniciado: iniciado,
+        );
         break;
       case AuthState.iniciado:
         print("Ejecutando la orden para usuarios nuevos");
@@ -92,10 +110,13 @@ class _RouterPageState extends State<RouterPage> {
         } else {
           this.usuarioNuevo = true;
           SignupPage(auth: widget.auth, onIniciado: iniciado);
+          print('correo guardado: ' + this.correoUsuario.toString());
           return new HomePage(
             auth: widget.auth,
             onCerrarSesion: noIniciado,
             drawerPosition: 0,
+            cantidadParticipacionesUsuario: this.cantidadParticipacionesUsuario,
+            correoUsuario: this.correoUsuario.toString(),
           );
         }
     }

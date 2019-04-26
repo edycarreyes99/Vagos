@@ -322,6 +322,7 @@ class _LoginPageState extends State<LoginPage> {
                     elevation: 7.0,
                     color: Colors.white,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         CircleAvatar(
                           backgroundColor: Colors.transparent,

@@ -615,6 +615,7 @@ class _SignupPageState extends State<SignupPage> {
                           onPressed: registrarseGoogle,
                           color: Colors.white,
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),

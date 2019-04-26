@@ -10,7 +10,9 @@
     "logs": "firebase functions:log"
   },
   "main": "lib/index.js",
+  "engines": {"node": "8"},
   "dependencies": {
+    "@google-cloud/firestore": "^1.2.0",
     "firebase-admin": "~7.0.0",
     "firebase-functions": "^2.2.0"
   },
