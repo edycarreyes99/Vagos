@@ -26,16 +26,13 @@ class _RouterPageState extends State<RouterPage> {
   bool usuarioNuevo = false;
   int cantidadParticipacionesUsuario;
   String correoUsuario;
+  String displayName;
 
   String respuesta;
   List<DocumentSnapshot> actividades = new List<DocumentSnapshot>();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    widget.auth.currentUser().then((userId) async {
+  Future<void> _realizarInitState() async {
+    await widget.auth.currentUser().then((userId) async {
       this.respuesta = null;
       this
           .widget
@@ -52,6 +49,7 @@ class _RouterPageState extends State<RouterPage> {
               this.cantidadParticipacionesUsuario =
                   usuario.data['CantidadParticipaciones'];
               this.correoUsuario = userId.email.toString();
+              this.displayName = usuario.data['displayName'].toString();
             });
           }).catchError((e) {
             print(e.toString());
@@ -65,6 +63,13 @@ class _RouterPageState extends State<RouterPage> {
         authState = userId == null ? AuthState.noIniciado : AuthState.iniciado;
       });
     });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _realizarInitState();
   }
 
   void iniciado() async {
@@ -117,6 +122,7 @@ class _RouterPageState extends State<RouterPage> {
             drawerPosition: 0,
             cantidadParticipacionesUsuario: this.cantidadParticipacionesUsuario,
             correoUsuario: this.correoUsuario.toString(),
+            displayName: this.displayName.toString(),
           );
         }
     }

@@ -13,13 +13,22 @@ class DrawerItem {
 }
 
 class NavSide extends StatefulWidget {
-  NavSide({this.auth, this.onCerrarSesion, this.drawerPosition});
+  NavSide(
+      {this.auth,
+      this.onCerrarSesion,
+      this.drawerPosition,
+      this.displayName,
+      this.correoUsuario});
 
   final int drawerPosition;
 
   final BaseAuth auth;
 
   final VoidCallback onCerrarSesion;
+
+  final String displayName;
+
+  final String correoUsuario;
 
   final drawerItems = [
     new DrawerItem("Actividades", Icons.explore),
@@ -166,11 +175,15 @@ class _NavSideState extends State<NavSide> {
         children: <Widget>[
           new UserAccountsDrawerHeader(
             accountName: new Text(
-              this.displayName == null ? 'Usuario' : this.displayName,
+              this.widget.displayName == null ? 'Usuario' : this.widget.displayName,
+              //this.displayName == null ? 'Usuario' : this.displayName,
               style: TextStyle(color: Colors.white),
             ),
             accountEmail: new Text(
-              this.correo == null ? 'example@username.com' : this.correo,
+              this.widget.correoUsuario == null
+                  ? 'example@username.com'
+                  : this.correo,
+              //this.correo == null ? 'example@username.com' : this.correo,
               style: TextStyle(color: Colors.white),
             ),
             currentAccountPicture: new GestureDetector(

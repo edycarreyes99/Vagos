@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:floating_search_bar/floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'navside.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
+import 'informacion.dart';
+import 'agregarActividad.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({
-    this.auth,
-    this.onCerrarSesion,
-    this.drawerPosition,
-    this.cantidadParticipacionesUsuario,
-    this.correoUsuario,
-  });
+class HomeApp extends StatefulWidget {
+  HomeApp(
+      {this.auth,
+      this.onCerrarSesion,
+      this.drawerPosition,
+      this.cantidadParticipacionesUsuario,
+      this.correoUsuario,
+      this.displayName});
   final BaseAuth auth;
   final int drawerPosition;
   final VoidCallback onCerrarSesion;
   static String tag = 'home-page';
   final int cantidadParticipacionesUsuario;
   final String correoUsuario;
+  final String displayName;
 
   void cerrarSesion() async {
     try {
@@ -31,10 +35,10 @@ class HomePage extends StatefulWidget {
   }
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomeAppState createState() => _HomeAppState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeAppState extends State<HomeApp> {
   final Firestore _fs = Firestore.instance;
 
   final CollectionReference actividadesRef =
@@ -46,6 +50,8 @@ class _HomePageState extends State<HomePage> {
   int cantActividades = null;
   List<DocumentSnapshot> actividades = new List<DocumentSnapshot>();
   List<DocumentSnapshot> actividadesAux = new List<DocumentSnapshot>();
+  List<bool> isSelected = new List<bool>();
+  bool modoEdicion = false;
 
   @override
   void initState() {
@@ -54,6 +60,7 @@ class _HomePageState extends State<HomePage> {
     this._extraerDatosUsuario();
     this.cantActividades = this.widget.cantidadParticipacionesUsuario;
     this.correo = this.widget.correoUsuario;
+    this.displayName = this.widget.displayName;
     print('el corrreo almacenado es: ' + this.widget.correoUsuario.toString());
     this._extraerActividades();
     //this._extraerCantActividades();
@@ -152,168 +159,327 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(fontFamily: 'GoogleSans'),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            child: CircleAvatar(
-              child: Image.asset('assets/AddGoogleLogo.png'),
-              radius: 11.5,
-              backgroundColor: Colors.white,
-            ),
-            backgroundColor: Colors.white,
-          ),
-          body: Padding(
-            padding: const EdgeInsets.only(top: 15.0),
-            child: FloatingSearchBar.builder(
-              itemCount: this.cantActividades == 0 ? 1 : this.cantActividades,
-              itemBuilder: (BuildContext context, int index) {
-                return this.cantActividades == 0
-                    ? Container(
-                        transform: Matrix4.translationValues(
-                            0.0, -(MediaQuery.of(context).size.height / 9), 0.0),
-                        child: new ConstrainedBox(
-                          constraints: new BoxConstraints(
-                            minHeight: MediaQuery.of(context).size.height,
-                            minWidth: MediaQuery.of(context).size.width,
-                            maxHeight: MediaQuery.of(context).size.height,
-                            maxWidth: MediaQuery.of(context).size.width,
-                          ),
-                          child: new DecoratedBox(
-                            decoration: new BoxDecoration(color: Colors.white),
-                            position: DecorationPosition.background,
-                            child: Center(
-                                child: Text(
-                              'Aún no perteneces a ningúna actividad.',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 20.0),
-                              textAlign: TextAlign.center,
-                            )),
-                          ),
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            if (this.modoEdicion) {
+              print("se van a eliminar las actividades seleccionadas");
+            } else {
+              print("Se va a agregar una nueva actividad");
+              navegarAgregarActividad(context);
+              /*showDialog(
+                    context: context,
+                    //barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(
+                          'Agregar una Nueva Actividad',
+                          style: TextStyle(fontFamily: 'GoogleSans'),
                         ),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          index == 0
-                              ? Padding(
-                                  padding: EdgeInsets.only(top: 15.0, left: 14.0),
-                                  child: Text(
-                                    'TUS ACTIVIDADES',
-                                    style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 11.0,
-                                        letterSpacing: 2.0,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                )
-                              : null,
-                          StreamBuilder(
-                              stream: this
-                                  .actividadesRef
-                                  .where('Participantes',
-                                      arrayContains: this.correo)
-                                  .snapshots(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                }
-                                switch (snapshot.connectionState) {
-                                  case ConnectionState.waiting:
-                                    return Text('');
-                                    /*Center(
-                                child: CircularProgressIndicator(
-                                  backgroundColor: Colors.orange,
-                                ),
-                              );*/
-                                    break;
-                                  default:
-                                    //this.realizarSetState(snapshot.data.documents.length);
-                                    return ListTile(
-                                      dense: false,
-                                      trailing: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            this.actividades[index].data['Fecha'],
-                                            style: TextStyle(
-                                                fontFamily: 'GoogleSans',
-                                                fontSize: 11.0),
-                                          ),
-                                          Text(
-                                            'NIO 400',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      leading: CircleAvatar(
-                                        backgroundColor: this._colorAleatorio(),
-                                        child: Center(
-                                          child: Text(
-                                            this
-                                                .actividades[index]
-                                                .data['Nombre']
-                                                .toString()
-                                                .substring(0, 1)
-                                                .toUpperCase(),
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 24.0,
-                                                fontWeight: FontWeight.w500,
-                                                fontFamily: 'GoogleSans'),
-                                          ),
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        this.actividades[index].data['Lugar'],
-                                        style:
-                                            TextStyle(fontFamily: 'GoogleSans'),
-                                      ),
-                                      title: Text(
-                                        this.actividades[index].data['Nombre'],
-                                        style:
-                                            TextStyle(fontFamily: 'GoogleSans'),
-                                      ),
-                                    );
-                                }
-                              })
-                        ].where((w) => w != null).toList(),
+                        content: Text(
+                          'Se va agregar una nueva actividad',
+                          style: TextStyle(fontFamily: 'GoogleSans'),
+                        ),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text(
+                              'Cancelar',
+                              style: TextStyle(fontFamily: 'GoogleSans'),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          FlatButton(
+                            child: Text(
+                              'Aceptar',
+                              style: TextStyle(fontFamily: 'GoogleSans'),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
                       );
-              },
-              trailing: GestureDetector(
-                onTap: () async {
-                  await this.widget.cerrarSesion();
-                },
-                child: CircleAvatar(
-                  backgroundImage: this.profilePhoto == null
-                      ? AssetImage('assets/profilePhotos/defaultMasculino.png')
-                      : NetworkImage(this.profilePhoto),
-                  backgroundColor: Colors.orange,
+                    });*/
+            }
+          },
+          child: this.modoEdicion
+              ? Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                )
+              : CircleAvatar(
+                  child: Image.asset('assets/AddGoogleLogo.png'),
+                  radius: 11.5,
+                  backgroundColor: Colors.white,
                 ),
-              ),
-              drawer: new NavSide(
-                drawerPosition: this.widget.drawerPosition,
-                onCerrarSesion: this.widget.onCerrarSesion,
-                auth: this.widget.auth,
-              ),
-              onChanged: (String value) {
-                this._buscarPorFiltrodeDato(value.toString());
+          backgroundColor: this.modoEdicion ? Colors.red : Colors.white,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: FloatingSearchBar.builder(
+            itemCount: this.cantActividades == 0 ? 1 : this.cantActividades,
+            itemBuilder: (BuildContext context, int index) {
+              return this.cantActividades == 0
+                  ? Container(
+                      transform: Matrix4.translationValues(
+                          0.0, -(MediaQuery.of(context).size.height / 9), 0.0),
+                      child: new ConstrainedBox(
+                        constraints: new BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height,
+                          minWidth: MediaQuery.of(context).size.width,
+                          maxHeight: MediaQuery.of(context).size.height,
+                          maxWidth: MediaQuery.of(context).size.width,
+                        ),
+                        child: new DecoratedBox(
+                          decoration: new BoxDecoration(color: Colors.white),
+                          position: DecorationPosition.background,
+                          child: Center(
+                              child: Text(
+                            'Aún no perteneces a ningúna actividad.',
+                            style:
+                                TextStyle(color: Colors.grey, fontSize: 20.0),
+                            textAlign: TextAlign.center,
+                          )),
+                        ),
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        index == 0
+                            ? Padding(
+                                padding: EdgeInsets.only(top: 15.0, left: 14.0),
+                                child: Text(
+                                  'TUS ACTIVIDADES',
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 11.0,
+                                      letterSpacing: 2.0,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              )
+                            : null,
+                        StreamBuilder(
+                            stream: this
+                                .actividadesRef
+                                .where('Participantes',
+                                    arrayContains: this.correo)
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              }
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.waiting:
+                                  return Text('');
+                                  break;
+                                default:
+                                  isSelected.add(false);
+                                  Color colorActividad = this._colorAleatorio();
+                                  void mostrarSeleccion() {
+                                    setState(() {
+                                      int coincidencias = 0;
+                                      isSelected[index] = !isSelected[index];
+                                      this.isSelected.forEach((valor) {
+                                        if (!valor) {
+                                          coincidencias++;
+                                        }
+                                      });
+                                      if (coincidencias ==
+                                          this.isSelected.length) {
+                                        this.modoEdicion = false;
+                                      }
+                                    });
+                                  }
+                                  //this.realizarSetState(snapshot.data.documents.length);
+                                  return ListTile(
+                                    selected: isSelected[index],
+                                    onTap: () {
+                                      if (this.modoEdicion) {
+                                        mostrarSeleccion();
+                                      } else {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    InformacionPage(
+                                                      auth: this.widget.auth,
+                                                      onCerrarSesion: this
+                                                          .widget
+                                                          .onCerrarSesion,
+                                                      documento: this
+                                                          .actividades[index],
+                                                      idDocumento: this
+                                                          .actividades[index]
+                                                          .data['Id']
+                                                          .toString(),
+                                                      colorAppBar:
+                                                          colorActividad,
+                                                    )));
+                                      }
+                                    },
+                                    onLongPress: () {
+                                      this.modoEdicion = true;
+                                      print("Seleccionado para eliminar");
+                                      mostrarSeleccion();
+                                    },
+                                    dense: false,
+                                    trailing: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          this.actividades[index].data['Fecha'],
+                                          style: TextStyle(
+                                              fontFamily: 'GoogleSans',
+                                              fontSize: 11.0),
+                                        ),
+                                        Text(
+                                          'NIO 400',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    ),
+                                    leading: CircleAvatar(
+                                      backgroundColor: colorActividad,
+                                      child: Center(
+                                        child: this.modoEdicion &&
+                                                this.isSelected[index]
+                                            ? Icon(
+                                                Icons.check,
+                                                color: Colors.white,
+                                              )
+                                            : Text(
+                                                this
+                                                    .actividades[index]
+                                                    .data['Nombre']
+                                                    .toString()
+                                                    .substring(0, 1)
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 24.0,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontFamily: 'GoogleSans'),
+                                              ),
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      this.actividades[index].data['Lugar'],
+                                      style:
+                                          TextStyle(fontFamily: 'GoogleSans'),
+                                    ),
+                                    title: Text(
+                                      this.actividades[index].data['Nombre'],
+                                      style:
+                                          TextStyle(fontFamily: 'GoogleSans'),
+                                    ),
+                                  );
+                              }
+                            })
+                      ].where((w) => w != null).toList(),
+                    );
+            },
+            trailing: GestureDetector(
+              onTap: () async {
+                await this.widget.cerrarSesion();
               },
-              onTap: () {
-                /*Navigator.push(
+              child: CircleAvatar(
+                backgroundImage: this.profilePhoto == null
+                    ? AssetImage('assets/profilePhotos/defaultMasculino.png')
+                    : NetworkImage(this.profilePhoto),
+                backgroundColor: Colors.orange,
+              ),
+            ),
+            drawer: new NavSide(
+              drawerPosition: this.widget.drawerPosition,
+              onCerrarSesion: this.widget.onCerrarSesion,
+              auth: this.widget.auth,
+              displayName: this.widget.displayName,
+              correoUsuario: this.widget.correoUsuario,
+            ),
+            onChanged: (String value) {
+              this._buscarPorFiltrodeDato(value.toString());
+            },
+            onTap: () {
+              /*Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => LoginPage(auth: this.widget.auth,onIniciado: this.widget.onCerrarSesion)));*/
-              },
-              decoration: InputDecoration.collapsed(
-                  hintText: 'Buscar', hintStyle: TextStyle(color: Colors.black)),
-            ),
-          )),
-    );
+            },
+            decoration: InputDecoration.collapsed(
+                hintText: 'Buscar', hintStyle: TextStyle(color: Colors.black)),
+          ),
+        ));
   }
+}
+
+class HomePage extends StatefulWidget {
+  HomePage(
+      {this.auth,
+      this.onCerrarSesion,
+      this.drawerPosition,
+      this.cantidadParticipacionesUsuario,
+      this.correoUsuario,
+      this.displayName});
+  final BaseAuth auth;
+  final int drawerPosition;
+  final VoidCallback onCerrarSesion;
+  static String tag = 'home-page';
+  final int cantidadParticipacionesUsuario;
+  final String correoUsuario;
+  final String displayName;
+
+  void cerrarSesion() async {
+    try {
+      await auth.cerrarSesion();
+      onCerrarSesion();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        routes: <String, WidgetBuilder>{
+          '/home': (BuildContext context) => HomeApp(
+                auth: this.widget.auth,
+                displayName: this.widget.displayName,
+                correoUsuario: this.widget.correoUsuario,
+                onCerrarSesion: this.widget.onCerrarSesion,
+                cantidadParticipacionesUsuario:
+                    this.widget.cantidadParticipacionesUsuario,
+              ),
+          '/agregarActividad': (BuildContext context) => AgregarActividad(
+                auth: this.widget.auth,
+                onCerrarSesion: this.widget.onCerrarSesion,
+              )
+        },
+        theme:
+            ThemeData(fontFamily: 'SanFrancisco'),
+        debugShowCheckedModeBanner: false,
+        home: HomeApp(
+          auth: this.widget.auth,
+          displayName: this.widget.displayName,
+          correoUsuario: this.widget.correoUsuario,
+          onCerrarSesion: this.widget.onCerrarSesion,
+          cantidadParticipacionesUsuario:
+              this.widget.cantidadParticipacionesUsuario,
+        ));
+  }
+}
+
+void navegarAgregarActividad(BuildContext context){
+  print('Navegando para agregar una actividad');
+  Navigator.of(context).pushNamed('/agregarActividad');
 }
