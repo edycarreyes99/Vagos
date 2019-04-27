@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:image_picker/image_picker.dart';
@@ -365,7 +366,6 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: new AppBar(
           iconTheme: IconThemeData(color: Colors.white),
@@ -418,10 +418,11 @@ class _SignupPageState extends State<SignupPage> {
                                         ? null
                                         : FileImage(_profilePicture),
                                     child: _profilePicture == null
-                                        ? Icon(
-                                            Icons.add_a_photo,
-                                            size: 40,
-                                          )
+                                        ? Center(
+                                            child: Icon(
+                                            CupertinoIcons.add_circled,
+                                            size: 50,
+                                          ))
                                         : null,
                                   ),
                                 ),

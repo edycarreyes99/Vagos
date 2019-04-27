@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'signup.dart';
@@ -230,7 +231,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     final loginForm = Container(
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -244,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(
                       color: Colors.grey,
                       fontSize: 15.0,
-                      fontFamily: 'Arciform'),
+                      fontFamily: 'SanFrancisco'),
                 ),
               ),
               Container(
@@ -310,7 +310,8 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.orange,
                         child: Text(
                           'Iniciar Sesión',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(50.0))),
@@ -330,15 +331,18 @@ class _LoginPageState extends State<LoginPage> {
                           child: Image.asset('assets/GoogleLogo.jpg'),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.only(left: 2.0, right: 2.0),
                           child: Text(
                             '|',
                             style: TextStyle(color: Colors.grey),
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: Text('Inicia Sesión con Google'),
+                          padding: const EdgeInsets.only(left: 3),
+                          child: Text('Ingresa con Google',
+                              style: TextStyle(
+                                  fontFamily: 'SanFrancisco',
+                                  fontWeight: FontWeight.bold)),
                         )
                       ],
                     ),
@@ -350,59 +354,70 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ));
 
-    return Scaffold(
-        backgroundColor: Colors.white,
-        body: Builder(
-            builder: (context) => Center(
-                  child: ListView(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(left: 24.0, right: 24.0),
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
-                        child: Center(
-                          child: Text(
-                            'Te damos la bienvenida a',
-                            style: TextStyle(fontSize: 20, color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        child: Center(
-                          child: Text(
-                            'Vagos',
-                            style: TextStyle(
-                                color: Colors.orange[700],
-                                //color: Colors.black,
-                                fontSize: 50.0,
-                                fontFamily: 'Arciform'),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 28.0),
-                            loginForm,
-                          ],
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                          child: FlatButton(
-                            child: Text('Registrarse',
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme:
+            ThemeData(primaryColor: Colors.orange, fontFamily: 'SanFrancisco'),
+        home: Scaffold(
+            backgroundColor: Colors.white,
+            body: Builder(
+                builder: (context) => Center(
+                      child: ListView(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(left: 24.0, right: 24.0),
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
+                            child: Center(
+                              child: Text(
+                                'Te damos la bienvenida a',
                                 style: TextStyle(
-                                    color: Colors.orange, fontSize: 18.0)),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignupPage(auth: this.widget.auth,onIniciado: this.widget.onIniciado)));
-                            },
-                          ))
-                    ],
-                  ),
-                )));
+                                    fontSize: 20, color: Colors.black),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+                            child: Center(
+                              child: Text(
+                                'Vagos',
+                                style: TextStyle(
+                                    color: Colors.orange[700],
+                                    //color: Colors.black,
+                                    fontSize: 50.0,
+                                    fontFamily: 'SanFrancisco'),
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(height: 28.0),
+                                loginForm,
+                              ],
+                            ),
+                          ),
+                          Padding(
+                              padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                              child: FlatButton(
+                                child: Text('Registrarse',
+                                    style: TextStyle(
+                                        color: Colors.orange,
+                                        fontSize: 22.0,
+                                        fontFamily: 'SanFrancisco',
+                                        fontWeight: FontWeight.normal)),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SignupPage(
+                                              auth: this.widget.auth,
+                                              onIniciado:
+                                                  this.widget.onIniciado)));
+                                },
+                              ))
+                        ],
+                      ),
+                    ))));
   }
 }

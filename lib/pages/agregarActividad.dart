@@ -14,10 +14,25 @@ class _AgregarActividadState extends State<AgregarActividad> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Agregar Actividad',
-      theme: ThemeData(platform: TargetPlatform.iOS),
+      theme: ThemeData(
+          /*platform: TargetPlatform.iOS,*/
+          primaryColor: Colors.orange,
+          scaffoldBackgroundColor: Colors.white,
+          cursorColor: Colors.orange,
+          appBarTheme: AppBarTheme(
+              iconTheme: IconThemeData(
+                color: Colors.white,
+              ),
+              actionsIconTheme: IconThemeData(color: Colors.white))),
       home: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
           backgroundColor: Colors.orange,
           title: Text(
             'Agregar Actividad',

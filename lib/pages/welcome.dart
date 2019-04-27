@@ -25,7 +25,7 @@ class _WelcomePageState extends State<WelcomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(top: 20.0,bottom: 30.0),
               child: CircleAvatar(
                 child: Image.asset('assets/Logotipo.png'),
                 radius: 40.0,
@@ -35,7 +35,10 @@ class _WelcomePageState extends State<WelcomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Vagos',
-                style: TextStyle(fontSize: 45.0, fontWeight: FontWeight.w400),
+                style: TextStyle(
+                    fontSize: 45.0,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'SanFrancisco'),
               ),
             ),
             Padding(
@@ -43,7 +46,10 @@ class _WelcomePageState extends State<WelcomePage> {
               child: Text(
                 'Crea listas de salidas entre amigos de una manera facil y rapida con \"Vagos\".',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15.0, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: 15.0,
+                    color: Colors.grey,
+                    fontFamily: 'SanFrancisco'),
               ),
             ),
             Padding(
@@ -63,19 +69,41 @@ class _WelcomePageState extends State<WelcomePage> {
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                   child: Text(
                     'EMPEZAR',
-                    style: TextStyle(color: Colors.white, fontSize: 15.0),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'SanFrancisco'),
                   ),
                 ),
                 color: Colors.orange,
               ),
             ),
-            Text(
-              'Powered by FireCodes\nEdycar Reyes',
-              style: TextStyle(
-                color: Colors.black45,
-                fontSize: 15.0,
-              ),
-              textAlign: TextAlign.center,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Powered by FireLabs',
+                  style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 16.0,
+                      fontFamily: 'SanFrancisco'),
+                  textAlign: TextAlign.center,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 3.0,bottom: 20.0),
+                  child: Text(
+                    'Edycar Reyes',
+                    style: TextStyle(
+                        color: Colors.black45,
+                        fontSize: 14.0,
+                        fontFamily: 'SanFrancisco',
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             )
           ],
         ),

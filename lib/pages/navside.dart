@@ -177,14 +177,14 @@ class _NavSideState extends State<NavSide> {
             accountName: new Text(
               this.widget.displayName == null ? 'Usuario' : this.widget.displayName,
               //this.displayName == null ? 'Usuario' : this.displayName,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontFamily: 'GoogleSans'),
             ),
             accountEmail: new Text(
               this.widget.correoUsuario == null
                   ? 'example@username.com'
                   : this.correo,
               //this.correo == null ? 'example@username.com' : this.correo,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontFamily: 'GoogleSans'),
             ),
             currentAccountPicture: new GestureDetector(
               /*onTap: () => Navigator.push(
