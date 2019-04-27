@@ -61,7 +61,9 @@ flutter:
         - asset: 'assets/fuentes/Arciform/Arciform.otf'
     - family: SanFrancisco
       fonts:
-        - asset: 'assets/fuentes/SanFrancisco/SF-Pro-Display-Thin.otf'
+      - asset: 'assets/fuentes/SanFrancisco/SF-Pro-Display-Thin.otf'
+      - asset: 'assets/fuentes/SanFrancisco/SF-Pro-Text-Bold.otf'
+        weight: 700
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
