@@ -69,7 +69,9 @@ class _RouterPageState extends State<RouterPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _realizarInitState();
+    setState(() {
+      _realizarInitState();
+    });
   }
 
   void iniciado() async {

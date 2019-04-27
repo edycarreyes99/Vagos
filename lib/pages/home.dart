@@ -160,7 +160,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: 'SanFrancisco',/* platform: TargetPlatform.iOS,*/),
+      theme: ThemeData(
+        fontFamily: 'SanFrancisco', /* platform: TargetPlatform.iOS,*/
+      ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
           floatingActionButton: FloatingActionButton(
@@ -169,7 +171,13 @@ class _HomePageState extends State<HomePage> {
                 print("se van a eliminar las actividades seleccionadas");
               } else {
                 print("Se va a agregar una nueva actividad");
-                Navigator.of(context).pushNamed('/agregarActividad');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AgregarActividad(
+                              auth: this.widget.auth,
+                              onCerrarSesion: this.widget.onCerrarSesion,
+                            )));
                 /*showDialog(
                     context: context,
                     //barrierDismissible: false,
@@ -341,13 +349,17 @@ class _HomePageState extends State<HomePage> {
                                                 .actividades[index]
                                                 .data['Fecha'],
                                             style: TextStyle(
-                                                fontFamily: 'GoogleSans',
-                                                fontSize: 11.0),
+                                                fontFamily: 'SanFrancisco',
+                                                fontSize: 11.0,
+                                              fontWeight: FontWeight.normal
+                                            ),
                                           ),
                                           Text(
                                             'NIO 400',
                                             style: TextStyle(
-                                                fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                              fontFamily: 'SanFrancisco'
+                                            ),
                                           )
                                         ],
                                       ),
@@ -379,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                                       subtitle: Text(
                                         this.actividades[index].data['Lugar'],
                                         style:
-                                            TextStyle(fontFamily: 'GoogleSans'),
+                                            TextStyle(fontFamily: 'SanFrancisco'),
                                       ),
                                       title: Text(
                                         this.actividades[index].data['Nombre'],
