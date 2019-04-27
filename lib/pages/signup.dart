@@ -20,7 +20,6 @@ class SignupPage extends StatefulWidget {
   final VoidCallback onIniciado;
 
   static String tag = 'signup-page';
-
   @override
   _SignupPageState createState() => _SignupPageState();
 }

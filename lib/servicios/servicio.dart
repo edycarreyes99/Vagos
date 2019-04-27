@@ -2,6 +2,13 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mysql1/mysql1.dart';
+
+class DatosUsuario {
+  String displayName;
+  String Correo;
+  String photoURL;
+}
 
 abstract class BaseAuth {
   Future<String> iniciarSesion(String email, String password);
@@ -14,17 +21,66 @@ abstract class BaseAuth {
   Future<List<String>> agregarNuevoUsuarioRegistradoAlControl(String email);
   Future<List<dynamic>> extraerUsuariosControl();
   Future<String> verificarSiEsUsuarioNuevo();
+  Future<MySqlConnection> conectarSQL();
+  Future<void> agregarActualizarBaseDeDatos(
+      String correo, String displayName, String photoURL);
+  Future<void> extraerDatosUsuarioSQL(String correo);
+  DatosUsuario retornarDatosUsuarioSQL();
 }
 
 class Servicio implements BaseAuth {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final Firestore _fs = Firestore.instance;
+  MySqlConnection conector;
+  DatosUsuario datosUsuario = new DatosUsuario();
 
   Future<String> iniciarSesion(String email, String password) async {
     FirebaseUser user = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
+    await this.conectarSQL().then((MySqlConnection conector) {
+      this.conector = conector;
+    });
     return user.email;
+  }
+
+  DatosUsuario retornarDatosUsuarioSQL() {
+    return this.datosUsuario;
+  }
+
+  Future<void> extraerDatosUsuarioSQL(String correo) async {
+    await this.conectarSQL().then((MySqlConnection conector) async {
+      await conector.query(
+          'select displayName, Correo, photoURL from Usuarios where Correo = ?',
+          [correo]).then((Results resultados) {
+        DatosUsuario retorno = new DatosUsuario();
+        for (var row in resultados) {
+          retorno.displayName = row[0];
+          retorno.Correo = row[1];
+          retorno.photoURL = row[2];
+        }
+        this.datosUsuario = retorno;
+      }).catchError((e) {
+        print(e.toString());
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
+  }
+
+  Future<void> agregarActualizarBaseDeDatos(
+      String correo, String displayName, String photoURL) async {
+    await this.conectarSQL().then((MySqlConnection conector) async {
+      await conector.query(
+          'insert into Usuarios (Correo, displayName, photoURL) values (?, ?, ?)',
+          [correo, displayName, photoURL]).then((Results resultados) {
+        print('Id del nuevo Usuario: $displayName');
+      }).catchError((e) {
+        print(e.toString());
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
   }
 
   Future<String> verificarSiEsUsuarioNuevo() async {
@@ -102,6 +158,22 @@ class Servicio implements BaseAuth {
     return user;
   }
 
+  Future<MySqlConnection> conectarSQL() async {
+    try {
+      var settings = new ConnectionSettings(
+          host: 'remotemysql.com',
+          port: 3306,
+          user: 'RhZ7ulq7eo',
+          password: 'O1Wq6swDlY',
+          db: 'RhZ7ulq7eo');
+      print('Conectado');
+      return await MySqlConnection.connect(settings);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
   Future<FirebaseUser> registrarUsuarioGoogle(
       GoogleSignInAccount googleUser) async {
     final GoogleSignInAuthentication googleAuth =
@@ -110,7 +182,8 @@ class Servicio implements BaseAuth {
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
 
-    final FirebaseUser user = await _firebaseAuth.signInWithCredential(credential);
+    final FirebaseUser user =
+        await _firebaseAuth.signInWithCredential(credential);
 
     return user;
   }
@@ -131,6 +204,9 @@ class Servicio implements BaseAuth {
     final FirebaseUser user =
         await _firebaseAuth.signInWithCredential(credential);
     print('Se ha Iniciado sesion con Google como : ${user.displayName}');
+    try {} catch (e) {
+      print(e.toString());
+    }
     return user.email;
   }
 

@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 import 'informacion.dart';
 import 'agregarActividad.dart';
+import 'package:mysql1/mysql1.dart';
 
 class HomePage extends StatefulWidget {
   HomePage(
@@ -57,12 +58,15 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    this._extraerDatosUsuario();
-    this.cantActividades = this.widget.cantidadParticipacionesUsuario;
-    this.correo = this.widget.correoUsuario;
-    this.displayName = this.widget.displayName;
-    print('el corrreo almacenado es: ' + this.widget.correoUsuario.toString());
-    this._extraerActividades();
+    setState(() {
+      this._extraerDatosUsuario();
+      this.cantActividades = this.widget.cantidadParticipacionesUsuario;
+      this.correo = this.widget.correoUsuario;
+      this.displayName = this.widget.displayName;
+      print(
+          'el corrreo almacenado es: ' + this.widget.correoUsuario.toString());
+      this._extraerActividades();
+    });
     //this._extraerCantActividades();
   }
 
@@ -351,15 +355,13 @@ class _HomePageState extends State<HomePage> {
                                             style: TextStyle(
                                                 fontFamily: 'SanFrancisco',
                                                 fontSize: 11.0,
-                                              fontWeight: FontWeight.normal
-                                            ),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                           Text(
                                             'NIO 400',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                              fontFamily: 'SanFrancisco'
-                                            ),
+                                                fontFamily: 'SanFrancisco'),
                                           )
                                         ],
                                       ),
@@ -390,8 +392,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       subtitle: Text(
                                         this.actividades[index].data['Lugar'],
-                                        style:
-                                            TextStyle(fontFamily: 'SanFrancisco'),
+                                        style: TextStyle(
+                                            fontFamily: 'SanFrancisco'),
                                       ),
                                       title: Text(
                                         this.actividades[index].data['Nombre'],

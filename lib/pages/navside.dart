@@ -5,6 +5,13 @@ import 'dart:math';
 import 'package:vagos/servicios/servicio.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mysql1/mysql1.dart';
+
+class DatosUsuario {
+  String displayName;
+  String Correo;
+  String photoURL;
+}
 
 class DrawerItem {
   String title;
@@ -18,7 +25,8 @@ class NavSide extends StatefulWidget {
       this.onCerrarSesion,
       this.drawerPosition,
       this.displayName,
-      this.correoUsuario});
+      this.correoUsuario,
+      this.conector});
 
   final int drawerPosition;
 
@@ -29,6 +37,8 @@ class NavSide extends StatefulWidget {
   final String displayName;
 
   final String correoUsuario;
+
+  final MySqlConnection conector;
 
   final drawerItems = [
     new DrawerItem("Actividades", Icons.explore),
@@ -43,21 +53,25 @@ class _NavSideState extends State<NavSide> {
   int _selectedDrawerIndex = 0;
 
   final Firestore _fs = Firestore.instance;
+  DatosUsuario datosUsuario = new DatosUsuario();
 
   String profilePhoto;
   String displayName;
   String correo;
 
-  extraerDatosUsuario() async {
-    await this.widget.auth.currentUser().then((FirebaseUser user) async {
-      await _fs
-          .document('Vagos/Control/Usuarios/${user.email.toString()}')
-          .get()
-          .then((DocumentSnapshot usuario) {
+  /*Future<void> extraerDatosUsuarioSQL() async {
+    await this.widget.auth.currentUser().then((FirebaseUser usuario) async {
+      await this.widget.conector.query(
+          'select displayName, Correo, photoURL from Usuarios where Correo = ?',
+          [usuario.email.toString()]).then((Results resultados) {
+        DatosUsuario retorno = new DatosUsuario();
+        for (var row in resultados) {
+          retorno.displayName = row[0];
+          retorno.Correo = row[1];
+          retorno.photoURL = row[2];
+        }
         setState(() {
-          this.profilePhoto = usuario['photoProfile'].toString();
-          this.displayName = usuario['displayName'].toString();
-          this.correo = usuario['Email'].toString();
+          this.datosUsuario = retorno;
         });
       }).catchError((e) {
         print(e.toString());
@@ -65,7 +79,7 @@ class _NavSideState extends State<NavSide> {
     }).catchError((e) {
       print(e.toString());
     });
-  }
+  }*/
 
   _getDrawerItemWidget(int pos) {
     switch (pos) {
@@ -109,7 +123,11 @@ class _NavSideState extends State<NavSide> {
     super.initState();
     _selectedDrawerIndex = this.widget.drawerPosition;
     print("Se ha navegado a la posicion: $_selectedDrawerIndex");
-    this.extraerDatosUsuario();
+    //this.extraerDatosUsuarioSQL();
+    var datosUsuarioAux = this.widget.auth.retornarDatosUsuarioSQL();
+    this.datosUsuario.Correo = datosUsuarioAux.Correo;
+    this.datosUsuario.displayName = datosUsuarioAux.displayName;
+    this.datosUsuario.photoURL = datosUsuarioAux.photoURL;
   }
 
   @override
@@ -148,21 +166,13 @@ class _NavSideState extends State<NavSide> {
                 _onSelectItem(i);
                 _getDrawerItemWidget(_selectedDrawerIndex);
               },
-              title: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  new Icon(
-                    d.icon,
-                    color: Colors.orange,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(30.0, 2, 0, 0),
-                    child: new Text(
-                      d.title,
-                      style: TextStyle(color: Colors.orange, fontSize: 15.0),
-                    ),
-                  ),
-                ],
+              leading: Icon(
+                d.icon,
+                color: Colors.orange,
+              ),
+              title: Text(
+                d.title,
+                style: TextStyle(color: Colors.orange, fontSize: 15.0),
               ),
             ),
           ),
@@ -175,16 +185,18 @@ class _NavSideState extends State<NavSide> {
         children: <Widget>[
           new UserAccountsDrawerHeader(
             accountName: new Text(
-              this.widget.displayName == null ? 'Usuario' : this.widget.displayName,
+              this.datosUsuario.displayName == null
+                  ? 'Usuario'
+                  : this.datosUsuario.displayName,
               //this.displayName == null ? 'Usuario' : this.displayName,
-              style: TextStyle(color: Colors.white,fontFamily: 'GoogleSans'),
+              style: TextStyle(color: Colors.white, fontFamily: 'GoogleSans'),
             ),
             accountEmail: new Text(
-              this.widget.correoUsuario == null
+              this.datosUsuario.Correo == null
                   ? 'example@username.com'
-                  : this.correo,
+                  : this.datosUsuario.Correo,
               //this.correo == null ? 'example@username.com' : this.correo,
-              style: TextStyle(color: Colors.white,fontFamily: 'GoogleSans'),
+              style: TextStyle(color: Colors.white, fontFamily: 'GoogleSans'),
             ),
             currentAccountPicture: new GestureDetector(
               /*onTap: () => Navigator.push(
@@ -194,9 +206,9 @@ class _NavSideState extends State<NavSide> {
                         auth: this.widget.auth,
                         onCerrarSesion: this.widget.onCerrarSesion))),*/
               child: new CircleAvatar(
-                backgroundImage: this.profilePhoto == null
+                backgroundImage: this.datosUsuario.photoURL == null
                     ? AssetImage('assets/profilePhotos/defaultMasculino.png')
-                    : NetworkImage(this.profilePhoto),
+                    : NetworkImage(this.datosUsuario.photoURL),
               ),
             ),
             decoration: new BoxDecoration(

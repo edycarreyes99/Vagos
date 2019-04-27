@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/newUser.dart';
 import 'package:vagos/pages/signup.dart';
 import 'pages/welcome.dart';
+import 'package:mysql1/mysql1.dart';
 
 class RouterPage extends StatefulWidget {
   RouterPage({this.auth});
@@ -27,6 +28,7 @@ class _RouterPageState extends State<RouterPage> {
   int cantidadParticipacionesUsuario;
   String correoUsuario;
   String displayName;
+  MySqlConnection conectorSql;
 
   String respuesta;
   List<DocumentSnapshot> actividades = new List<DocumentSnapshot>();
@@ -41,10 +43,31 @@ class _RouterPageState extends State<RouterPage> {
           .then((List<dynamic> idUsuarios) async {
         if (!(userId == null)) {
           await this
+              .widget
+              .auth
+              .extraerDatosUsuarioSQL(userId.email)
+              .then((onValue) {
+            print('Usuarios extraidos y almacenados de sql');
+          }).catchError((e) {
+            print(e.toString());
+          });
+          await this
               ._fs
               .document('Vagos/Control/Usuarios/${userId.email}')
               .get()
-              .then((DocumentSnapshot usuario) {
+              .then((DocumentSnapshot usuario) async {
+            await this
+                .widget
+                .auth
+                .agregarActualizarBaseDeDatos(
+                    usuario.data['Email'].toString(),
+                    usuario.data['displayName'].toString(),
+                    usuario.data['photoProfile'].toString())
+                .then((onValue) {
+              print('Usuario agregado a la base de datos sql');
+            }).catchError((e) {
+              print(e.toString());
+            });
             setState(() {
               this.cantidadParticipacionesUsuario =
                   usuario.data['CantidadParticipaciones'];
@@ -70,7 +93,19 @@ class _RouterPageState extends State<RouterPage> {
     // TODO: implement initState
     super.initState();
     setState(() {
+      conectarSql();
       _realizarInitState();
+    });
+  }
+
+  Future<void> conectarSql() async {
+    await this.widget.auth.conectarSQL().then((MySqlConnection conector) {
+      setState(() {
+        this.conectorSql = conector;
+        print(this.conectorSql.toString());
+      });
+    }).catchError((e) {
+      print(e.toString());
     });
   }
 
