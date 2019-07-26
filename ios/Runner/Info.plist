@@ -13,6 +13,12 @@
 	<key>CFBundleName</key>
 	<string>vagos</string>
 	<key>CFBundlePackageType</key>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Se requiere acceso a la fototeca para poder acceder a las imágenes.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Se necesita acceder a la cámara del dispositivo para poder tomar fotos y actualizar la imagen de perfil.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Se necesita acceder al micrófono para grabar videos desde la cámara.</string>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
